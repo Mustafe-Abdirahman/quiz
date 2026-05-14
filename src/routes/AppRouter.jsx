@@ -35,14 +35,14 @@ export default function AppRouter() {
         <Route path="/admin/questions" element={<ProtectedRoute role="admin"><QuestionManagement /></ProtectedRoute>} />
         <Route path="/admin/competition" element={<ProtectedRoute role="admin"><CompetitionMonitor /></ProtectedRoute>} />
         <Route path="/admin/rooms" element={<ProtectedRoute role="admin"><AdminLayout><CompetitionRooms /></AdminLayout></ProtectedRoute>} />
-        <Route path="/admin/room/:code" element={<ProtectedRoute role="admin"><AdminLayout><MultiplayerRoom /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/room/:id" element={<ProtectedRoute role="admin"><AdminLayout><MultiplayerRoom /></AdminLayout></ProtectedRoute>} />
 
         <Route path="/user/dashboard" element={<ProtectedRoute role="user"><UserDashboard /></ProtectedRoute>} />
         <Route path="/user/quizzes" element={<ProtectedRoute role="user"><QuizList /></ProtectedRoute>} />
         <Route path="/user/play/:id" element={<ProtectedRoute role="user"><QuizPlayer /></ProtectedRoute>} />
         <Route path="/user/leaderboard" element={<ProtectedRoute role="user"><Leaderboard /></ProtectedRoute>} />
         <Route path="/user/rooms" element={<ProtectedRoute><UserLayout><CompetitionRooms /></UserLayout></ProtectedRoute>} />
-        <Route path="/user/room/:code" element={<ProtectedRoute><UserLayout><MultiplayerRoom /></UserLayout></ProtectedRoute>} />
+        <Route path="/user/room/:id" element={<ProtectedRoute><UserLayout><MultiplayerRoom /></UserLayout></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

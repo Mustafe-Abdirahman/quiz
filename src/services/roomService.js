@@ -11,6 +11,11 @@ export const roomService = {
     return rooms.find(r => r.code === code);
   },
 
+  getRoomById(id) {
+    const rooms = this.getRooms();
+    return rooms.find(r => r.id === id);
+  },
+
   createRoom(hostId, hostName, quizId, maxPlayers = 4) {
     const rooms = this.getRooms();
     const code = generateRoomCode();

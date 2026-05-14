@@ -9,7 +9,7 @@ import { useToast } from '../../components/ui/Toast';
 import { getInitials, roomRoute } from '../../utils/helpers';
 
 export default function MultiplayerRoom() {
-  const { code } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const role = user?.role;
@@ -39,7 +39,7 @@ export default function MultiplayerRoom() {
   }, [user]);
 
   const refreshRoom = useCallback(() => {
-    const r = roomService.getRoomByCode(code);
+    const r = roomService.getRoomById(id);
     if (!r) return;
     setRoom(r);
     setPlayers([...r.players].sort((a, b) => b.score - a.score));
@@ -48,10 +48,10 @@ export default function MultiplayerRoom() {
       const sorted = [...r.players].sort((a, b) => b.score - a.score);
       setWinner(sorted[0]);
     }
-  }, [code]);
+  }, [id]);
 
   useEffect(() => {
-    const r = roomService.getRoomByCode(code);
+    const r = roomService.getRoomById(id);
     if (!r) { navigate(roomRoute(role, '/rooms')); return; }
     setRoom(r);
 
@@ -76,12 +76,12 @@ export default function MultiplayerRoom() {
     intervalRef.current = setInterval(refreshRoom, 1000);
     return () => clearInterval(intervalRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, navigate]);
+  }, [id, navigate]);
 
   const handleStartGame = () => {
     const qIds = allQuestions.map(q => q.id);
     roomService.startGame(room.code, qIds);
-    const updatedRoom = roomService.getRoomByCode(room.code);
+    const updatedRoom = roomService.getRoomById(room.id);
     setRoom(updatedRoom);
     const loaded = loadMyQuestions(updatedRoom, allQuestions);
     if (loaded.length) setMyQuestions(loaded);

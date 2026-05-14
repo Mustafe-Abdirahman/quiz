@@ -50,18 +50,18 @@ export default function CompetitionRooms() {
     if (result.success) {
       addToast('Joined room!', 'success');
       setJoinModal(false);
-      navigate(roomRoute(role, `/room/${result.room.code}`));
+      navigate(roomRoute(role, `/room/${result.room.id}`));
     } else {
       addToast(result.message, 'error');
     }
   };
 
-  const handleStart = (code) => {
-    const room = roomService.getRoomByCode(code);
+  const handleStart = (roomId) => {
+    const room = roomService.getRoomById(roomId);
     const questionIds = quizService.getQuestionsByQuizId(room?.quizId).map(q => q.id);
-    const result = roomService.startGame(code, questionIds);
+    const result = roomService.startGame(room.code, questionIds);
     if (result.success) {
-      navigate(roomRoute(role, `/room/${code}`));
+      navigate(roomRoute(role, `/room/${roomId}`));
     }
   };
 
@@ -108,7 +108,7 @@ export default function CompetitionRooms() {
                 <Button size="sm" variant="secondary" onClick={() => handleCopyCode(newRoom.code)}>
                   {copied ? <><FiCheck size={14} /> Copied</> : <><FiCopy size={14} /> Copy Code</>}
                 </Button>
-                <Button size="sm" onClick={() => handleStart(newRoom.code)}>
+                <Button size="sm" onClick={() => handleStart(newRoom.id)}>
                   Start Game
                 </Button>
               </div>
@@ -144,7 +144,7 @@ export default function CompetitionRooms() {
                     </div>
                     <Button size="sm" onClick={() => {
                       const result = roomService.joinRoom(room.code, user?.userId, user?.username);
-                      if (result.success) navigate(roomRoute(role, `/room/${room.code}`));
+                      if (result.success) navigate(roomRoute(role, `/room/${room.id}`));
                       else addToast(result.message, 'error');
                     }} className="w-full">
                       <FiLogIn size={14} /> Join
@@ -178,17 +178,17 @@ export default function CompetitionRooms() {
                       ))}
                     </div>
                     {room.status === 'waiting' && room.hostId === user?.userId && (
-                      <Button size="sm" onClick={() => handleStart(room.code)} className="w-full">
+                      <Button size="sm" onClick={() => handleStart(room.id)} className="w-full">
                         Start Game
                       </Button>
                     )}
                     {room.status === 'playing' && (
-                      <Button size="sm" onClick={() => navigate(roomRoute(role, `/room/${room.code}`))} className="w-full">
+                      <Button size="sm" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full">
                         Rejoin
                       </Button>
                     )}
                     {room.status === 'finished' && (
-                      <Button size="sm" variant="secondary" onClick={() => navigate(roomRoute(role, `/room/${room.code}`))} className="w-full">
+                      <Button size="sm" variant="secondary" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full">
                         View Results
                       </Button>
                     )}
