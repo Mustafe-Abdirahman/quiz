@@ -1,0 +1,404 @@
+import { useState, useMemo, useRef } from 'react';
+import { FiPlus, FiEdit2, FiTrash2, FiBookOpen, FiUpload, FiDownload } from 'react-icons/fi';
+import * as XLSX from 'xlsx';
+import AdminLayout from '../../layouts/AdminLayout';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
+import Modal from '../../components/ui/Modal';
+import Card from '../../components/ui/Card';
+import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/common/EmptyState';
+import { useQuiz } from '../../context/QuizContext';
+import { useToast } from '../../components/ui/Toast';
+
+const EXPECTED_HEADERS = ['Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Answer', 'Difficulty'];
+const DIFFICULTIES = ['easy', 'medium', 'hard'];
+
+function normalizeHeader(h) {
+  if (!h) return '';
+  const s = h.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (s === 'question' || s === 'questiontext' || s === 'text') return 'Question';
+  if (s === 'optiona' || s === 'option1' || s === 'option1' || s === 'a') return 'Option A';
+  if (s === 'optionb' || s === 'option2' || s === 'b') return 'Option B';
+  if (s === 'optionc' || s === 'option3' || s === 'c') return 'Option C';
+  if (s === 'optiond' || s === 'option4' || s === 'd') return 'Option D';
+  if (s === 'correctanswer' || s === 'correct' || s === 'answer') return 'Correct Answer';
+  if (s === 'difficulty' || s === 'level' || s === 'diff') return 'Difficulty';
+  return h.toString().trim();
+}
+
+export default function QuestionManagement() {
+  const { quizzes, questions, addQuestion, editQuestion, removeQuestion } = useQuiz();
+  const { addToast } = useToast();
+  const fileInputRef = useRef(null);
+  const [selectedQuizId, setSelectedQuizId] = useState('');
+  const [search, setSearch] = useState('');
+  const [modal, setModal] = useState({ open: false, mode: 'create', question: null });
+  const [form, setForm] = useState({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
+
+  const selectedQuiz = useMemo(() => quizzes.find(q => q.id === selectedQuizId), [quizzes, selectedQuizId]);
+
+  const quizQuestions = useMemo(() => {
+    if (!selectedQuizId) return [];
+    return questions.filter(q => q.quizId === selectedQuizId);
+  }, [questions, selectedQuizId]);
+
+  const filtered = useMemo(() => {
+    if (!search) return quizQuestions;
+    const q = search.toLowerCase();
+    return quizQuestions.filter(x => x.text.toLowerCase().includes(q));
+  }, [quizQuestions, search]);
+
+  const openCreate = () => {
+    if (!selectedQuizId) { addToast('Select a quiz first', 'error'); return; }
+    setForm({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
+    setModal({ open: true, mode: 'create', question: null });
+  };
+
+  const openEdit = (q) => {
+    setForm({
+      text: q.text,
+      option1: q.options[0] || '',
+      option2: q.options[1] || '',
+      option3: q.options[2] || '',
+      option4: q.options[3] || '',
+      correctAnswer: String(q.correctAnswer),
+      difficulty: q.difficulty,
+    });
+    setModal({ open: true, mode: 'edit', question: q });
+  };
+
+  const handleSubmit = () => {
+    if (!form.text.trim()) { addToast('Question text is required', 'error'); return; }
+    const options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
+    if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
+    const data = {
+      text: form.text,
+      options,
+      correctAnswer: Number(form.correctAnswer),
+      category: selectedQuiz?.category || 'General',
+      difficulty: form.difficulty,
+      quizId: selectedQuizId,
+    };
+    if (modal.mode === 'create') {
+      addQuestion(data);
+      addToast('Question created', 'success');
+    } else {
+      editQuestion(modal.question.id, data);
+      addToast('Question updated', 'success');
+    }
+    setModal({ open: false });
+  };
+
+  const handleDelete = (q) => {
+    if (window.confirm('Delete this question?')) {
+      removeQuestion(q.id);
+      addToast('Question deleted', 'success');
+    }
+  };
+
+  const parseImportedRow = (row) => {
+    const q = row['Question'] || row['question'] || '';
+    const oa = row['Option A'] || row['option1'] || '';
+    const ob = row['Option B'] || row['option2'] || '';
+    const oc = row['Option C'] || row['option3'] || '';
+    const od = row['Option D'] || row['option4'] || '';
+    let correct = row['Correct Answer'] ?? row['correctAnswer'] ?? row['correct'] ?? 0;
+    const diff = row['Difficulty'] || row['difficulty'] || 'medium';
+
+    if (typeof correct === 'string') {
+      const uc = correct.toString().trim().toUpperCase();
+      if (uc === 'A' || uc === '1') correct = 0;
+      else if (uc === 'B' || uc === '2') correct = 1;
+      else if (uc === 'C' || uc === '3') correct = 2;
+      else if (uc === 'D' || uc === '4') correct = 3;
+      else correct = parseInt(correct) || 0;
+    }
+    correct = Number(correct);
+    if (correct < 0 || correct > 3) correct = 0;
+
+    const difficulty = DIFFICULTIES.includes(diff.toString().toLowerCase()) ? diff.toString().toLowerCase() : 'medium';
+    const options = [oa, ob, oc, od].filter(o => o.toString().trim());
+    if (!q.toString().trim() || options.length < 2) return null;
+
+    return {
+      text: q.toString().trim(),
+      options,
+      correctAnswer: correct,
+      category: selectedQuiz?.category || 'General',
+      difficulty,
+      quizId: selectedQuizId,
+    };
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (!json.length) {
+          addToast('File is empty or has no valid data', 'error');
+          return;
+        }
+
+        const headers = Object.keys(json[0]).map(normalizeHeader);
+        const hasRequired = EXPECTED_HEADERS.some(h => headers.includes(h));
+        if (!hasRequired) {
+          addToast('Unrecognized format. Expected columns: Question, Option A-D, Correct Answer, Difficulty', 'error');
+          return;
+        }
+
+        const normalized = json.map(row => {
+          const nRow = {};
+          Object.entries(row).forEach(([k, v]) => {
+            nRow[normalizeHeader(k)] = v;
+          });
+          return nRow;
+        });
+
+        let imported = 0;
+        let skipped = 0;
+        normalized.forEach(row => {
+          const parsed = parseImportedRow(row);
+          if (parsed) {
+            addQuestion(parsed);
+            imported++;
+          } else {
+            skipped++;
+          }
+        });
+
+        addToast(`Imported ${imported} question(s)${skipped > 0 ? `, ${skipped} skipped (invalid rows)` : ''}`, imported > 0 ? 'success' : 'error');
+      } catch (err) {
+        addToast(`Import failed: ${err.message}`, 'error');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = '';
+  };
+
+  const handleExport = (format) => {
+    if (!quizQuestions.length) {
+      addToast('No questions to export', 'error');
+      return;
+    }
+
+    const data = quizQuestions.map(q => ({
+      Question: q.text,
+      'Option A': q.options[0] || '',
+      'Option B': q.options[1] || '',
+      'Option C': q.options[2] || '',
+      'Option D': q.options[3] || '',
+      'Correct Answer': q.correctAnswer,
+      Difficulty: q.difficulty,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Questions');
+    const fileName = `${selectedQuiz?.title || 'questions'}`.replace(/[^a-zA-Z0-9]/g, '_');
+
+    if (format === 'csv') {
+      const csv = XLSX.utils.sheet_to_csv(ws);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${fileName}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } else {
+      XLSX.writeFile(wb, `${fileName}.xlsx`);
+    }
+
+    addToast(`Exported ${quizQuestions.length} question(s) as ${format.toUpperCase()}`, 'success');
+  };
+
+  const quizOptions = [
+    { value: '', label: '-- Select a Quiz --' },
+    ...quizzes.map(q => ({
+      value: q.id,
+      label: `${q.thumbnail || '📝'} ${q.title} (${questions.filter(qu => qu.quizId === q.id).length} questions)`,
+    })),
+  ];
+
+  const diffOptions = [
+    { value: 'easy', label: 'Easy' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'hard', label: 'Hard' },
+  ];
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Question Management</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {selectedQuiz
+                ? `${quizQuestions.length} questions in "${selectedQuiz.title}"`
+                : 'Select a quiz to manage its questions'}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {selectedQuizId && (
+              <>
+                <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                  <FiUpload size={14} /> Import
+                </Button>
+                <div className="relative group">
+                  <Button variant="secondary" size="sm" disabled={!quizQuestions.length}>
+                    <FiDownload size={14} /> Export
+                  </Button>
+                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] hidden group-hover:block z-10">
+                    <button onClick={() => handleExport('xlsx')}
+                      className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      Export as XLSX
+                    </button>
+                    <button onClick={() => handleExport('csv')}
+                      className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      Export as CSV
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+            <Button onClick={openCreate} disabled={!selectedQuizId}>
+              <FiPlus size={16} /> Add Question
+            </Button>
+          </div>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          onChange={handleImport}
+          className="hidden"
+        />
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <FiBookOpen size={20} className="text-indigo-500 shrink-0" />
+            <div className="flex-1">
+              <Select
+                value={selectedQuizId}
+                onChange={e => { setSelectedQuizId(e.target.value); setSearch(''); }}
+                options={quizOptions}
+                className="w-full"
+              />
+            </div>
+            {selectedQuiz && (
+              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <Badge variant={selectedQuiz.difficulty}>{selectedQuiz.difficulty}</Badge>
+                <span>{selectedQuiz.totalQuestions || quizQuestions.length} questions</span>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {selectedQuizId && (
+          <div className="max-w-sm">
+            <Input
+              placeholder="Search questions..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+        )}
+
+        {!selectedQuizId ? (
+          <EmptyState
+            icon={FiBookOpen}
+            title="No quiz selected"
+            description="Select a quiz from the dropdown above to manage its questions. You must create a quiz first before adding questions."
+            action={
+              <Button to="/admin/quizzes">
+                <FiPlus size={16} /> Create Quiz
+              </Button>
+            }
+          />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={FiPlus}
+            title={search ? 'No questions match your search' : 'No questions yet'}
+            description={
+              search
+                ? 'Try a different search term.'
+                : `Add questions to "${selectedQuiz.title}" to get started.`
+            }
+            action={
+              !search ? (
+                <div className="flex gap-2">
+                  <Button onClick={openCreate}><FiPlus size={16} /> Add Question</Button>
+                  <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                    <FiUpload size={16} /> Import from File
+                  </Button>
+                </div>
+              ) : undefined
+            }
+          />
+        ) : (
+          <div className="space-y-3">
+            {filtered.map(q => (
+              <Card key={q.id} className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">{q.text}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {q.options.map((opt, i) => (
+                        <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
+                          {opt}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant={q.difficulty}>{q.difficulty}</Badge>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || selectedQuiz?.category}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
+                      <FiEdit2 size={14} />
+                    </button>
+                    <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
+                      <FiTrash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <Modal isOpen={modal.open} onClose={() => setModal({ open: false })} title={modal.mode === 'create' ? 'Add Question' : 'Edit Question'} size="lg">
+          <div className="space-y-4">
+            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-sm text-indigo-700 dark:text-indigo-300">
+              Adding question to: <strong>{selectedQuiz?.title}</strong>
+            </div>
+            <Input label="Question" value={form.text} onChange={e => setForm({ ...form, text: e.target.value })} placeholder="Enter question text" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input label="Option 1" value={form.option1} onChange={e => setForm({ ...form, option1: e.target.value })} placeholder="Option A" />
+              <Input label="Option 2" value={form.option2} onChange={e => setForm({ ...form, option2: e.target.value })} placeholder="Option B" />
+              <Input label="Option 3" value={form.option3} onChange={e => setForm({ ...form, option3: e.target.value })} placeholder="Option C" />
+              <Input label="Option 4" value={form.option4} onChange={e => setForm({ ...form, option4: e.target.value })} placeholder="Option D" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Select label="Correct Answer" value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })}
+                options={[{ value: '0', label: 'Option 1' }, { value: '1', label: 'Option 2' }, { value: '2', label: 'Option 3' }, { value: '3', label: 'Option 4' }]} />
+              <Select label="Difficulty" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })} options={diffOptions} />
+            </div>
+            <Button onClick={handleSubmit} className="w-full">{modal.mode === 'create' ? 'Add Question' : 'Save Changes'}</Button>
+          </div>
+        </Modal>
+      </div>
+    </AdminLayout>
+  );
+}
