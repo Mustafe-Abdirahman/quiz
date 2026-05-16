@@ -20,7 +20,7 @@ export default function Navbar() {
         { to: '/admin/dashboard', label: 'Dashboard', icon: FiGrid },
         { to: '/admin/users', label: 'Users', icon: FiUser },
         { to: '/admin/quizzes', label: 'Quizzes', icon: FiGrid },
-        { to: '/user/rooms', label: 'Rooms', icon: FiGrid },
+        { to: '/admin/rooms', label: 'Rooms', icon: FiGrid },
       ]
     : user
       ? [

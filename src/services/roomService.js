@@ -136,10 +136,26 @@ export const roomService = {
     return [...room.players].sort((a, b) => b.score - a.score);
   },
 
+  updateRoom(id, data) {
+    const rooms = this.getRooms();
+    const index = rooms.findIndex(r => r.id === id);
+    if (index === -1) return { success: false, message: 'Room not found' };
+    rooms[index] = { ...rooms[index], ...data };
+    storage.set(storage.keys.ROOMS, rooms);
+    return { success: true, room: rooms[index] };
+  },
+
   deleteRoom(code) {
     let rooms = this.getRooms();
     rooms = rooms.filter(r => r.code !== code);
     storage.set(storage.keys.ROOMS, rooms);
+  },
+
+  deleteRoomById(id) {
+    let rooms = this.getRooms();
+    rooms = rooms.filter(r => r.id !== id);
+    storage.set(storage.keys.ROOMS, rooms);
+    return { success: true };
   },
 
   getUserRooms(userId) {

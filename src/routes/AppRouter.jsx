@@ -10,6 +10,7 @@ import UserManagement from '../pages/admin/UserManagement';
 import QuizManagement from '../pages/admin/QuizManagement';
 import QuestionManagement from '../pages/admin/QuestionManagement';
 import CompetitionMonitor from '../pages/admin/CompetitionMonitor';
+import AdminRoomManagement from '../pages/admin/AdminRoomManagement';
 import AdminLayout from '../layouts/AdminLayout';
 
 import UserDashboard from '../pages/user/UserDashboard';
@@ -34,7 +35,7 @@ export default function AppRouter() {
         <Route path="/admin/quizzes" element={<ProtectedRoute role="admin"><QuizManagement /></ProtectedRoute>} />
         <Route path="/admin/questions" element={<ProtectedRoute role="admin"><QuestionManagement /></ProtectedRoute>} />
         <Route path="/admin/competition" element={<ProtectedRoute role="admin"><CompetitionMonitor /></ProtectedRoute>} />
-        <Route path="/admin/rooms" element={<ProtectedRoute role="admin"><AdminLayout><CompetitionRooms /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/rooms" element={<ProtectedRoute role="admin"><AdminRoomManagement /></ProtectedRoute>} />
         <Route path="/admin/room/:id" element={<ProtectedRoute role="admin"><AdminLayout><MultiplayerRoom /></AdminLayout></ProtectedRoute>} />
 
         <Route path="/user/dashboard" element={<ProtectedRoute role="user"><UserDashboard /></ProtectedRoute>} />
