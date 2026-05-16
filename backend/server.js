@@ -18,8 +18,20 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 app.use(helmet());
 
-app.use(cors(isDev ? { origin: true, credentials: true } : {
-  origin: process.env.CLIENT_URL || 'https://yourdomain.com',
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5000',
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+];
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || isDev) return cb(null, true);
+    if (allowedOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app')) {
+      return cb(null, true);
+    }
+    cb(null, false);
+  },
   credentials: true,
 }));
 
