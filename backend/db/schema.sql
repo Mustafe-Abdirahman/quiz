@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS quizdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE quizdb;
+-- Database is created/enabled by init.js based on DB_NAME env
 
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(36) PRIMARY KEY,
