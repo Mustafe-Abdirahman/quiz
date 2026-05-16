@@ -1,5 +1,3 @@
-USE quizdb;
-
 INSERT IGNORE INTO users (id, username, email, password, fullName, role, createdAt) VALUES
 ('admin1', 'Admin', 'admin@quiz.com', '$2a$10$dummy', 'Administrator', 'admin', NOW());
 
