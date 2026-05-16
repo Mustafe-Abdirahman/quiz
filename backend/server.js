@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import pool from './config/db.js';
 
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
@@ -64,8 +65,13 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/attempts', attemptRoutes);
 app.use('/api/rooms', roomRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Quiz API is running' });
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ success: true, message: 'Quiz API is running', db: 'connected' });
+  } catch (e) {
+    res.status(500).json({ success: false, message: 'DB connection failed', error: e.message });
+  }
 });
 
 app.use((err, req, res, next) => {
