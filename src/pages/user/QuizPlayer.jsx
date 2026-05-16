@@ -33,19 +33,26 @@ export default function QuizPlayer() {
   const [emptyQuiz, setEmptyQuiz] = useState(false);
 
   useEffect(() => {
-    const q = quizService.getQuizById(id);
-    if (!q) { navigate('/user/quizzes'); return; }
-    setQuiz(q);
-    const qs = quizService.getQuestionsByQuizId(id);
-    if (qs.length === 0) {
-      setEmptyQuiz(true);
+    let cancelled = false;
+    async function load() {
+      const q = await quizService.getQuizById(id);
+      if (!q) { navigate('/user/quizzes'); return; }
+      if (cancelled) return;
+      setQuiz(q);
+      const qs = await quizService.getQuestionsByQuizId(id);
+      if (cancelled) return;
+      if (qs.length === 0) {
+        setEmptyQuiz(true);
+        setLoading(false);
+        return;
+      }
+      setQuestions(shuffleArray(qs));
       setLoading(false);
-      return;
+      setStartTime(Date.now());
+      await quizService.incrementPlayCount(id);
     }
-    setQuestions(shuffleArray(qs));
-    setLoading(false);
-    setStartTime(Date.now());
-    quizService.incrementPlayCount(id);
+    load();
+    return () => { cancelled = true; };
   }, [id, navigate]);
 
   const handleAnswer = useCallback((idx) => {
@@ -83,7 +90,7 @@ export default function QuizPlayer() {
     }]);
   }, [answered, questions, currentQ]);
 
-  const nextQuestion = useCallback(() => {
+  const nextQuestion = useCallback(async () => {
     if (currentQ + 1 < questions.length) {
       setCurrentQ(c => c + 1);
       setSelectedAnswer(null);
@@ -97,7 +104,7 @@ export default function QuizPlayer() {
       const incorrectCount = incorrect;
       const unansweredCount = unanswered + (answered ? 0 : 0);
 
-      quizService.saveAttempt({
+      await quizService.saveAttempt({
         userId: user?.userId,
         quizId: id,
         quizTitle: quiz?.title,

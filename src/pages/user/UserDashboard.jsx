@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiClock, FiAward } from 'react-icons/fi';
 import UserLayout from '../../layouts/UserLayout';
@@ -10,8 +10,21 @@ import EmptyState from '../../components/common/EmptyState';
 
 export default function UserDashboard() {
   const { user } = useAuth();
-  const attempts = useMemo(() => quizService.getUserAttempts(user?.userId), [user]);
-  const stats = useMemo(() => quizService.getUserStats(user?.userId), [user]);
+  const [attempts, setAttempts] = useState([]);
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    if (!user?.userId) return;
+    async function load() {
+      const [attemptsData, statsData] = await Promise.all([
+        quizService.getUserAttempts(user.userId),
+        quizService.getUserStats(user.userId),
+      ]);
+      setAttempts(attemptsData);
+      setStats(statsData);
+    }
+    load();
+  }, [user]);
 
   const recentAttempts = useMemo(() => {
     return [...attempts].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)).slice(0, 5);

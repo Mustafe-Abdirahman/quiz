@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiSearch, FiUserPlus, FiShield, FiEye, FiEyeOff } from 'react-icons/fi';
 import AdminLayout from '../../layouts/AdminLayout';
 import Button from '../../components/ui/Button';
@@ -19,7 +19,7 @@ export default function UserManagement() {
   const { refreshUser } = useAuth();
   const { addToast } = useToast();
   const [search, setSearch] = useState('');
-  const [users, setUsers] = useState(() => authService.getUsers());
+  const [users, setUsers] = useState([]);
   const [editModal, setEditModal] = useState({ open: false, user: null });
   const [editForm, setEditForm] = useState({ username: '', email: '', role: 'user' });
   const [registerModal, setRegisterModal] = useState(false);
@@ -30,14 +30,23 @@ export default function UserManagement() {
   const [registerErrors, setRegisterErrors] = useState({});
   const [registerLoading, setRegisterLoading] = useState(false);
 
+  useEffect(() => {
+    async function load() {
+      const data = await authService.getUsers();
+      setUsers(data);
+    }
+    load();
+  }, []);
+
   const filteredUsers = useMemo(() => {
     if (!search) return users;
     const q = search.toLowerCase();
     return users.filter(u => u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
   }, [users, search]);
 
-  const refresh = () => {
-    setUsers(authService.getUsers());
+  const refresh = async () => {
+    const data = await authService.getUsers();
+    setUsers(data);
     refreshUser();
   };
 
@@ -46,20 +55,20 @@ export default function UserManagement() {
     setEditModal({ open: true, user });
   };
 
-  const handleEdit = () => {
-    const result = authService.updateUser(editModal.user.id, editForm);
+  const handleEdit = async () => {
+    const result = await authService.updateUser(editModal.user.id, editForm);
     if (result.success) {
       addToast('User updated successfully', 'success');
       setEditModal({ open: false, user: null });
-      refresh();
+      await refresh();
     }
   };
 
-  const handleDelete = (id, username) => {
+  const handleDelete = async (id, username) => {
     if (window.confirm(`Delete user "${username}"?`)) {
-      authService.deleteUser(id);
+      await authService.deleteUser(id);
       addToast('User deleted', 'success');
-      refresh();
+      await refresh();
     }
   };
 
@@ -82,12 +91,12 @@ export default function UserManagement() {
     return errors;
   };
 
-  const handleRegisterSubmit = () => {
+  const handleRegisterSubmit = async () => {
     const errors = validateRegister();
     if (Object.keys(errors).length) { setRegisterErrors(errors); return; }
 
     setRegisterLoading(true);
-    const result = authService.register({
+    const result = await authService.createUser({
       fullName: registerForm.fullName.trim(),
       username: registerForm.username.trim(),
       email: registerForm.email.trim(),
@@ -97,9 +106,9 @@ export default function UserManagement() {
     setRegisterLoading(false);
 
     if (result.success) {
-      addToast('User registered successfully', 'success');
+      addToast('User created successfully', 'success');
       setRegisterModal(false);
-      refresh();
+      await refresh();
     } else {
       setRegisterErrors({ general: result.message });
       addToast(result.message, 'error');

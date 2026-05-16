@@ -36,21 +36,21 @@ export default function QuizManagement() {
     setModal({ open: true, mode: 'edit', quiz });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.title.trim()) { addToast('Title is required', 'error'); return; }
     if (modal.mode === 'create') {
-      addQuiz({ ...form, createdBy: user?.userId });
+      await addQuiz({ ...form, createdBy: user?.userId });
       addToast('Quiz created successfully! Now add questions to it.', 'success');
     } else {
-      editQuiz(modal.quiz.id, form);
+      await editQuiz(modal.quiz.id, form);
       addToast('Quiz updated', 'success');
     }
     setModal({ open: false, mode: 'create', quiz: null });
   };
 
-  const handleDelete = (quiz) => {
+  const handleDelete = async (quiz) => {
     if (window.confirm(`Delete quiz "${quiz.title}"? This will also remove all associated questions.`)) {
-      removeQuiz(quiz.id);
+      await removeQuiz(quiz.id);
       addToast('Quiz deleted', 'success');
     }
   };

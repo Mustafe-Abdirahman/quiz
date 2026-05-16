@@ -21,7 +21,7 @@ export default function LoginPage() {
     setErrors({ ...errors, [e.target.name]: '' });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
     if (!form.email) newErrors.email = 'Email is required';
@@ -29,7 +29,7 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     setLoading(true);
-    const result = login(form.email, form.password);
+    const result = await login(form.email, form.password);
     setLoading(false);
 
     if (result.success) {

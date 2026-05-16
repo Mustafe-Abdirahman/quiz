@@ -38,8 +38,8 @@ export default function MultiplayerRoom() {
       .filter(Boolean);
   }, [user]);
 
-  const refreshRoom = useCallback(() => {
-    const r = roomService.getRoomById(id);
+  const refreshRoom = useCallback(async () => {
+    const r = await roomService.getRoomById(id);
     if (!r) return;
     setRoom(r);
     setPlayers([...r.players].sort((a, b) => b.score - a.score));
@@ -51,71 +51,77 @@ export default function MultiplayerRoom() {
   }, [id]);
 
   useEffect(() => {
-    const r = roomService.getRoomById(id);
-    if (!r) { navigate(roomRoute(role, '/rooms')); return; }
-    setRoom(r);
+    let cancelled = false;
+    async function init() {
+      const r = await roomService.getRoomById(id);
+      if (!r || cancelled) { navigate(roomRoute(role, '/rooms')); return; }
+      if (cancelled) return;
+      setRoom(r);
 
-    const q = quizService.getQuizById(r.quizId);
-    if (q) {
-      setQuiz(q);
-      const qs = quizService.getQuestionsByQuizId(r.quizId);
-      setAllQuestions(qs);
-
-      if (r.status === 'playing') {
-        const loaded = loadMyQuestions(r, qs);
-        if (loaded.length) setMyQuestions(loaded);
+      const q = await quizService.getQuizById(r.quizId);
+      if (q && !cancelled) {
+        setQuiz(q);
+        const qs = await quizService.getQuestionsByQuizId(r.quizId);
+        if (!cancelled) {
+          setAllQuestions(qs);
+          if (r.status === 'playing') {
+            const loaded = loadMyQuestions(r, qs);
+            if (loaded.length) setMyQuestions(loaded);
+          }
+        }
       }
-    }
 
-    if (r.status === 'finished') {
-      setFinished(true);
-      const sorted = [...r.players].sort((a, b) => b.score - a.score);
-      setWinner(sorted[0]);
-    }
+      if (r.status === 'finished' && !cancelled) {
+        setFinished(true);
+        const sorted = [...r.players].sort((a, b) => b.score - a.score);
+        setWinner(sorted[0]);
+      }
 
-    intervalRef.current = setInterval(refreshRoom, 1000);
+      intervalRef.current = setInterval(() => { refreshRoom(); }, 1000);
+    }
+    init();
     return () => clearInterval(intervalRef.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, navigate]);
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     const qIds = allQuestions.map(q => q.id);
-    roomService.startGame(room.code, qIds);
-    const updatedRoom = roomService.getRoomById(room.id);
+    await roomService.startGame(room.code, qIds);
+    const updatedRoom = await roomService.getRoomById(room.id);
     setRoom(updatedRoom);
     const loaded = loadMyQuestions(updatedRoom, allQuestions);
     if (loaded.length) setMyQuestions(loaded);
   };
 
-  const handleAnswer = useCallback((idx) => {
+  const handleAnswer = useCallback(async (idx) => {
     if (answered || !room || !myQuestions[currentQ]) return;
     setSelectedAnswer(idx);
     setAnswered(true);
     setIsRunning(false);
     const isCorrect = idx === myQuestions[currentQ].correctAnswer;
-    roomService.submitAnswer(room.code, user?.userId, currentQ, idx, isCorrect, 0);
-    refreshRoom();
+    await roomService.submitAnswer(room.code, user?.userId, currentQ, idx, isCorrect, 0);
+    await refreshRoom();
   }, [answered, room, myQuestions, currentQ, user, refreshRoom]);
 
-  const handleTimeUp = useCallback(() => {
+  const handleTimeUp = useCallback(async () => {
     if (answered || !room || !myQuestions[currentQ]) return;
     setAnswered(true);
     setIsRunning(false);
-    roomService.submitAnswer(room.code, user?.userId, currentQ, -1, false, 60);
-    refreshRoom();
+    await roomService.submitAnswer(room.code, user?.userId, currentQ, -1, false, 60);
+    await refreshRoom();
   }, [answered, room, myQuestions, currentQ, user, refreshRoom]);
 
-  const nextQuestion = useCallback(() => {
+  const nextQuestion = useCallback(async () => {
     const nextIdx = currentQ + 1;
     if (nextIdx < myQuestions.length) {
-      roomService.nextPlayerQuestion(room.code, user?.userId);
+      await roomService.nextPlayerQuestion(room.code, user?.userId);
       setCurrentQ(nextIdx);
       setSelectedAnswer(null);
       setAnswered(false);
       setIsRunning(true);
       setTimerKey(k => k + 1);
     } else {
-      roomService.finishPlayer(room.code, user?.userId);
+      await roomService.finishPlayer(room.code, user?.userId);
       addToast('All questions complete!', 'success');
       clearInterval(intervalRef.current);
       setTimeout(refreshRoom, 500);

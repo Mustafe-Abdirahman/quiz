@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiAward, FiUsers } from 'react-icons/fi';
 import AdminLayout from '../../layouts/AdminLayout';
 import Card from '../../components/ui/Card';
@@ -8,7 +8,15 @@ import { roomService } from '../../services/roomService';
 import { getInitials } from '../../utils/helpers';
 
 export default function CompetitionMonitor() {
-  const rooms = useMemo(() => roomService.getRooms(), []);
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      const data = await roomService.getRooms();
+      setRooms(data);
+    }
+    load();
+  }, []);
 
   const finishedRooms = useMemo(() => rooms.filter(r => r.status === 'finished'), [rooms]);
   const activeRooms = useMemo(() => rooms.filter(r => r.status !== 'finished'), [rooms]);

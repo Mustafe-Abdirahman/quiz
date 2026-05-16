@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { FiUsers, FiBookOpen, FiBarChart2 } from 'react-icons/fi';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import AdminLayout from '../../layouts/AdminLayout';
@@ -7,6 +7,7 @@ import Card from '../../components/ui/Card';
 import { useAuth } from '../../context/AuthContext';
 import { useQuiz } from '../../context/QuizContext';
 import { quizService } from '../../services/quizService';
+import { authService } from '../../services/authService';
 import { getInitials } from '../../utils/helpers';
 import EmptyState from '../../components/common/EmptyState';
 
@@ -15,11 +16,24 @@ const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444'
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { quizzes, questions } = useQuiz();
-  const allUsers = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('quiz_users')) || []; } catch { return []; }
-  }, []);
+  const [allUsers, setAllUsers] = useState([]);
+  const [allAttempts, setAllAttempts] = useState([]);
 
-  const allAttempts = useMemo(() => quizService.getAllAttempts(), []);
+  useEffect(() => {
+    async function load() {
+      try {
+        const [users, attempts] = await Promise.all([
+          authService.getUsers(),
+          quizService.getAllAttempts(),
+        ]);
+        setAllUsers(users);
+        setAllAttempts(attempts);
+      } catch (e) {
+        console.error('Failed to load dashboard data', e);
+      }
+    }
+    load();
+  }, []);
 
   const stats = useMemo(() => {
     const totalUsers = allUsers.length;

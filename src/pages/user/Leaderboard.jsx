@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { FiAward } from 'react-icons/fi';
 import UserLayout from '../../layouts/UserLayout';
 import Card from '../../components/ui/Card';
@@ -9,7 +9,15 @@ import { getInitials } from '../../utils/helpers';
 
 export default function Leaderboard() {
   const { user } = useAuth();
-  const leaderboard = useMemo(() => quizService.getLeaderboard(), []);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      const data = await quizService.getLeaderboard();
+      setLeaderboard(data);
+    }
+    load();
+  }, []);
 
   const getRankStyle = (i) => {
     if (i === 0) return 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400';

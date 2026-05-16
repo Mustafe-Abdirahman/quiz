@@ -1,58 +1,70 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { quizService } from '../services/quizService';
 
 const QuizContext = createContext(null);
 
 export function QuizProvider({ children }) {
-  const [quizzes, setQuizzes] = useState(() => quizService.getQuizzes());
-  const [questions, setQuestions] = useState(() => quizService.getQuestions());
-  const [categories, setCategories] = useState(() => quizService.getCategories());
+  const [quizzes, setQuizzes] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    setQuizzes(quizService.getQuizzes());
-    setQuestions(quizService.getQuestions());
-    setCategories(quizService.getCategories());
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    const [q, qs, cats] = await Promise.all([
+      quizService.getQuizzes(),
+      quizService.getQuestions(),
+      quizService.getCategories(),
+    ]);
+    setQuizzes(q);
+    setQuestions(qs);
+    setCategories(cats);
+    setLoading(false);
   }, []);
 
-  const addQuiz = useCallback((data) => {
-    const result = quizService.createQuiz(data);
+  useEffect(() => { loadAll(); }, [loadAll]);
+
+  const refresh = useCallback(() => { loadAll(); }, [loadAll]);
+
+  const addQuiz = useCallback(async (data) => {
+    const result = await quizService.createQuiz(data);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
-  const editQuiz = useCallback((id, data) => {
-    const result = quizService.updateQuiz(id, data);
+  const editQuiz = useCallback(async (id, data) => {
+    const result = await quizService.updateQuiz(id, data);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
-  const removeQuiz = useCallback((id) => {
-    const result = quizService.deleteQuiz(id);
+  const removeQuiz = useCallback(async (id) => {
+    const result = await quizService.deleteQuiz(id);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
-  const addQuestion = useCallback((data) => {
-    const result = quizService.createQuestion(data);
+  const addQuestion = useCallback(async (data) => {
+    const result = await quizService.createQuestion(data);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
-  const editQuestion = useCallback((id, data) => {
-    const result = quizService.updateQuestion(id, data);
+  const editQuestion = useCallback(async (id, data) => {
+    const result = await quizService.updateQuestion(id, data);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
-  const removeQuestion = useCallback((id) => {
-    const result = quizService.deleteQuestion(id);
+  const removeQuestion = useCallback(async (id) => {
+    const result = await quizService.deleteQuestion(id);
     if (result.success) refresh();
     return result;
   }, [refresh]);
 
   return (
     <QuizContext.Provider value={{
-      quizzes, questions, categories, refresh,
+      quizzes, questions, categories, loading, refresh,
       addQuiz, editQuiz, removeQuiz,
       addQuestion, editQuestion, removeQuestion,
     }}>

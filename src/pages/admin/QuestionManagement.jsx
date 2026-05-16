@@ -69,7 +69,7 @@ export default function QuestionManagement() {
     setModal({ open: true, mode: 'edit', question: q });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.text.trim()) { addToast('Question text is required', 'error'); return; }
     const options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
     if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
@@ -82,18 +82,18 @@ export default function QuestionManagement() {
       quizId: selectedQuizId,
     };
     if (modal.mode === 'create') {
-      addQuestion(data);
+      await addQuestion(data);
       addToast('Question created', 'success');
     } else {
-      editQuestion(modal.question.id, data);
+      await editQuestion(modal.question.id, data);
       addToast('Question updated', 'success');
     }
     setModal({ open: false });
   };
 
-  const handleDelete = (q) => {
+  const handleDelete = async (q) => {
     if (window.confirm('Delete this question?')) {
-      removeQuestion(q.id);
+      await removeQuestion(q.id);
       addToast('Question deleted', 'success');
     }
   };
@@ -132,12 +132,12 @@ export default function QuestionManagement() {
     };
   };
 
-  const handleImport = (e) => {
+  const handleImport = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
         const data = new Uint8Array(evt.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
@@ -166,15 +166,15 @@ export default function QuestionManagement() {
 
         let imported = 0;
         let skipped = 0;
-        normalized.forEach(row => {
+        for (const row of normalized) {
           const parsed = parseImportedRow(row);
           if (parsed) {
-            addQuestion(parsed);
+            await addQuestion(parsed);
             imported++;
           } else {
             skipped++;
           }
-        });
+        }
 
         addToast(`Imported ${imported} question(s)${skipped > 0 ? `, ${skipped} skipped (invalid rows)` : ''}`, imported > 0 ? 'success' : 'error');
       } catch (err) {

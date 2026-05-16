@@ -38,13 +38,13 @@ export default function RegisterPage() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     setLoading(true);
-    const result = register({
+    const result = await register({
       fullName: form.fullName.trim(),
       username: form.username.trim(),
       email: form.email.trim(),

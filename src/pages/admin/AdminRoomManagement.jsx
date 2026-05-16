@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus, FiLogIn, FiUsers, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import AdminLayout from '../../layouts/AdminLayout';
@@ -17,7 +17,7 @@ export default function AdminRoomManagement() {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const { quizzes } = useQuiz();
-  const [rooms, setRooms] = useState(() => roomService.getRooms());
+  const [rooms, setRooms] = useState([]);
   const [editModal, setEditModal] = useState({ open: false, room: null });
   const [form, setForm] = useState({ quizId: '', maxPlayers: 4, status: 'waiting' });
   const [createModal, setCreateModal] = useState(false);
@@ -25,41 +25,52 @@ export default function AdminRoomManagement() {
   const [selectedQuiz, setSelectedQuiz] = useState('');
   const [roomCode, setRoomCode] = useState('');
 
-  const refresh = () => setRooms([...roomService.getRooms()]);
+  useEffect(() => {
+    async function load() {
+      const data = await roomService.getRooms();
+      setRooms(data);
+    }
+    load();
+  }, []);
+
+  const refresh = async () => {
+    const data = await roomService.getRooms();
+    setRooms(data);
+  };
 
   const openEdit = (room) => {
     setForm({ quizId: room.quizId, maxPlayers: room.maxPlayers, status: room.status });
     setEditModal({ open: true, room });
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!form.quizId) { addToast('Please select a quiz', 'error'); return; }
-    const result = roomService.updateRoom(editModal.room.id, form);
+    const result = await roomService.updateRoom(editModal.room.id, form);
     if (result.success) {
       addToast('Room updated', 'success');
       setEditModal({ open: false, room: null });
-      refresh();
+      await refresh();
     } else {
       addToast(result.message, 'error');
     }
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!selectedQuiz) { addToast('Please select a quiz', 'error'); return; }
     const quiz = quizzes.find(q => q.id === selectedQuiz);
     const maxPlayers = quiz?.maxPlayers || 4;
-    const result = roomService.createRoom('admin', 'Admin', selectedQuiz, maxPlayers);
+    const result = await roomService.createRoom('admin', 'Admin', selectedQuiz, maxPlayers);
     if (result.success) {
       addToast(`Room created! Code: ${result.room.code}`, 'success');
       setCreateModal(false);
       setSelectedQuiz('');
-      refresh();
+      await refresh();
     }
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!roomCode.trim()) { addToast('Please enter a room code', 'error'); return; }
-    const result = roomService.joinRoom(roomCode.toUpperCase(), 'admin', 'Admin');
+    const result = await roomService.joinRoom(roomCode.toUpperCase(), 'admin', 'Admin');
     if (result.success) {
       addToast('Joined room!', 'success');
       setJoinModal(false);
@@ -70,11 +81,11 @@ export default function AdminRoomManagement() {
     }
   };
 
-  const handleDelete = (room) => {
+  const handleDelete = async (room) => {
     if (window.confirm(`Delete room "${room.code}"? This action cannot be undone.`)) {
-      roomService.deleteRoomById(room.id);
+      await roomService.deleteRoomById(room.id);
       addToast('Room deleted', 'success');
-      refresh();
+      await refresh();
     }
   };
 
@@ -82,10 +93,10 @@ export default function AdminRoomManagement() {
     return [...rooms].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [rooms]);
 
-  const quizOptions = quizzes.map(q => ({
+  const quizOptions = useMemo(() => quizzes.map(q => ({
     value: q.id,
     label: `${q.thumbnail || '📝'} ${q.title} (${q.maxPlayers || 4}p)`,
-  }));
+  })), [quizzes]);
 
   const statusOptions = [
     { value: 'waiting', label: 'Waiting' },

@@ -15,14 +15,15 @@ export function AdminStats({ stats, links = {} }) {
 }
 
 export function UserStats({ stats }) {
+  const s = stats || { totalQuizzes: 0, totalCorrect: 0, totalIncorrect: 0, bestScore: 0, averageScore: 0, totalAccuracy: 0 };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <StatCard icon={FiBookOpen} label="Quizzes Taken" value={stats.totalQuizzes} color="indigo" />
-      <StatCard icon={FiCheckCircle} label="Correct" value={stats.totalCorrect} color="green" />
-      <StatCard icon={FiXCircle} label="Incorrect" value={stats.totalIncorrect} color="red" />
-      <StatCard icon={FiTarget} label="Best Score" value={stats.bestScore} color="blue" />
-      <StatCard icon={FiBarChart2} label="Avg Score" value={stats.averageScore} color="purple" />
-      <StatCard icon={FiTarget} label="Accuracy" value={`${stats.totalAccuracy}%`} color="yellow" />
+      <StatCard icon={FiBookOpen} label="Quizzes Taken" value={s.totalQuizzes} color="indigo" />
+      <StatCard icon={FiCheckCircle} label="Correct" value={s.totalCorrect} color="green" />
+      <StatCard icon={FiXCircle} label="Incorrect" value={s.totalIncorrect} color="red" />
+      <StatCard icon={FiTarget} label="Best Score" value={s.bestScore} color="blue" />
+      <StatCard icon={FiBarChart2} label="Avg Score" value={s.averageScore} color="purple" />
+      <StatCard icon={FiTarget} label="Accuracy" value={`${s.totalAccuracy}%`} color="yellow" />
     </div>
   );
 }
