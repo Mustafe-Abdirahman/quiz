@@ -4,7 +4,7 @@ import pool from '../config/db.js';
 export async function getQuestions(req, res) {
   try {
     const [rows] = await pool.query('SELECT * FROM questions ORDER BY id');
-    const parsed = rows.map(q => ({ ...q, options: JSON.parse(q.options) }));
+    const parsed = rows.map(q => ({ ...q, options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options }));
     res.json({ success: true, questions: parsed });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch questions' });
@@ -14,7 +14,7 @@ export async function getQuestions(req, res) {
 export async function getQuestionsByQuizId(req, res) {
   try {
     const [rows] = await pool.query('SELECT * FROM questions WHERE quizId = ?', [req.params.quizId]);
-    const parsed = rows.map(q => ({ ...q, options: JSON.parse(q.options) }));
+    const parsed = rows.map(q => ({ ...q, options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options }));
     res.json({ success: true, questions: parsed });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch questions' });
@@ -36,7 +36,7 @@ export async function createQuestion(req, res) {
       [id, quizId || null, text, JSON.stringify(options), Number(correctAnswer), category || 'General', difficulty || 'medium']
     );
     const [rows] = await pool.query('SELECT * FROM questions WHERE id = ?', [id]);
-    const question = { ...rows[0], options: JSON.parse(rows[0].options) };
+    const question = { ...rows[0], options: typeof rows[0].options === 'string' ? JSON.parse(rows[0].options) : rows[0].options };
     res.status(201).json({ success: true, question });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to create question' });

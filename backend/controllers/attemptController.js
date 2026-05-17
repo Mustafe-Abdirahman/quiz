@@ -4,7 +4,7 @@ import pool from '../config/db.js';
 export async function getAttempts(req, res) {
   try {
     const [rows] = await pool.query('SELECT * FROM attempts ORDER BY completedAt DESC');
-    const parsed = rows.map(a => ({ ...a, answers: a.answers ? JSON.parse(a.answers) : [] }));
+    const parsed = rows.map(a => ({ ...a, answers: a.answers ?? [] }));
     res.json({ success: true, attempts: parsed });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch attempts' });
@@ -14,7 +14,7 @@ export async function getAttempts(req, res) {
 export async function getUserAttempts(req, res) {
   try {
     const [rows] = await pool.query('SELECT * FROM attempts WHERE userId = ? ORDER BY completedAt DESC', [req.params.userId]);
-    const parsed = rows.map(a => ({ ...a, answers: a.answers ? JSON.parse(a.answers) : [] }));
+    const parsed = rows.map(a => ({ ...a, answers: a.answers ?? [] }));
     res.json({ success: true, attempts: parsed });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch attempts' });

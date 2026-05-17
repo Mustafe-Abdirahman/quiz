@@ -45,7 +45,7 @@ export async function register(req, res) {
     const hashed = await bcrypt.hash(password, 10);
     const id = crypto.randomUUID();
     await pool.query(
-      'INSERT INTO users (id, username, email, password, fullName, role, createdAt) VALUES (?, ?, ?, ?, ?, "user", NOW())',
+      'INSERT INTO users (id, username, email, password, fullName, role, createdAt) VALUES (?, ?, ?, ?, ?, \'user\', NOW())',
       [id, username, email, hashed, fullName || username]
     );
     const token = generateToken({ id, role: 'user', username, email });

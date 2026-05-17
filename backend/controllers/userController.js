@@ -30,7 +30,7 @@ export async function updateUser(req, res) {
     if (fullName !== undefined) updates.fullName = fullName;
     if (password !== undefined) updates.password = await bcrypt.hash(password, 10);
     if (role !== undefined) {
-      const [[{ count }]] = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = "admin"');
+      const [[{ count }]] = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = \'admin\'');
       if (count <= 1) {
         const [[target]] = await pool.query('SELECT role FROM users WHERE id = ?', [req.params.id]);
         if (target && target.role === 'admin' && role !== 'admin') {
