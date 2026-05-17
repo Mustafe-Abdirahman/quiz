@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiBookOpen, FiUpload, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiBookOpen, FiUpload, FiDownload, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import * as XLSX from 'xlsx';
 import AdminLayout from '../../layouts/AdminLayout';
 import Button from '../../components/ui/Button';
@@ -19,7 +19,7 @@ function normalizeHeader(h) {
   if (!h) return '';
   const s = h.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
   if (s === 'question' || s === 'questiontext' || s === 'text') return 'Question';
-  if (s === 'optiona' || s === 'option1' || s === 'option1' || s === 'a') return 'Option A';
+  if (s === 'optiona' || s === 'option1' || s === 'a') return 'Option A';
   if (s === 'optionb' || s === 'option2' || s === 'b') return 'Option B';
   if (s === 'optionc' || s === 'option3' || s === 'c') return 'Option C';
   if (s === 'optiond' || s === 'option4' || s === 'd') return 'Option D';
@@ -32,28 +32,31 @@ export default function QuestionManagement() {
   const { quizzes, questions, addQuestion, editQuestion, removeQuestion } = useQuiz();
   const { addToast } = useToast();
   const fileInputRef = useRef(null);
-  const [selectedQuizId, setSelectedQuizId] = useState('');
   const [search, setSearch] = useState('');
-  const [modal, setModal] = useState({ open: false, mode: 'create', question: null });
+  const [expanded, setExpanded] = useState({});
+  const [modal, setModal] = useState({ open: false, mode: 'create', question: null, quizId: '' });
   const [form, setForm] = useState({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
 
-  const selectedQuiz = useMemo(() => quizzes.find(q => q.id === selectedQuizId), [quizzes, selectedQuizId]);
+  const questionsByQuiz = useMemo(() => {
+    const map = {};
+    questions.forEach(q => {
+      if (!map[q.quizId]) map[q.quizId] = [];
+      map[q.quizId].push(q);
+    });
+    return map;
+  }, [questions]);
 
-  const quizQuestions = useMemo(() => {
-    if (!selectedQuizId) return [];
-    return questions.filter(q => q.quizId === selectedQuizId);
-  }, [questions, selectedQuizId]);
+  const sortedQuizzes = useMemo(() => {
+    return [...quizzes].sort((a, b) => a.title.localeCompare(b.title));
+  }, [quizzes]);
 
-  const filtered = useMemo(() => {
-    if (!search) return quizQuestions;
-    const q = search.toLowerCase();
-    return quizQuestions.filter(x => x.text.toLowerCase().includes(q));
-  }, [quizQuestions, search]);
+  const toggleQuiz = (id) => {
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
-  const openCreate = () => {
-    if (!selectedQuizId) { addToast('Select a quiz first', 'error'); return; }
+  const openCreate = (quizId) => {
     setForm({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
-    setModal({ open: true, mode: 'create', question: null });
+    setModal({ open: true, mode: 'create', question: null, quizId });
   };
 
   const openEdit = (q) => {
@@ -66,20 +69,21 @@ export default function QuestionManagement() {
       correctAnswer: String(q.correctAnswer),
       difficulty: q.difficulty,
     });
-    setModal({ open: true, mode: 'edit', question: q });
+    setModal({ open: true, mode: 'edit', question: q, quizId: q.quizId });
   };
 
   const handleSubmit = async () => {
     if (!form.text.trim()) { addToast('Question text is required', 'error'); return; }
     const options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
     if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
+    const quiz = quizzes.find(q => q.id === modal.quizId);
     const data = {
       text: form.text,
       options,
       correctAnswer: Number(form.correctAnswer),
-      category: selectedQuiz?.category || 'General',
+      category: quiz?.category || 'General',
       difficulty: form.difficulty,
-      quizId: selectedQuizId,
+      quizId: modal.quizId,
     };
     if (modal.mode === 'create') {
       await addQuestion(data);
@@ -98,7 +102,7 @@ export default function QuestionManagement() {
     }
   };
 
-  const parseImportedRow = (row) => {
+  const parseImportedRow = (row, quizId) => {
     const q = row['Question'] || row['question'] || '';
     const oa = row['Option A'] || row['option1'] || '';
     const ob = row['Option B'] || row['option2'] || '';
@@ -126,9 +130,9 @@ export default function QuestionManagement() {
       text: q.toString().trim(),
       options,
       correctAnswer: correct,
-      category: selectedQuiz?.category || 'General',
+      category: quizzes.find(qu => qu.id === quizId)?.category || 'General',
       difficulty,
-      quizId: selectedQuizId,
+      quizId,
     };
   };
 
@@ -164,19 +168,7 @@ export default function QuestionManagement() {
           return nRow;
         });
 
-        let imported = 0;
-        let skipped = 0;
-        for (const row of normalized) {
-          const parsed = parseImportedRow(row);
-          if (parsed) {
-            await addQuestion(parsed);
-            imported++;
-          } else {
-            skipped++;
-          }
-        }
-
-        addToast(`Imported ${imported} question(s)${skipped > 0 ? `, ${skipped} skipped (invalid rows)` : ''}`, imported > 0 ? 'success' : 'error');
+        addToast('Select a quiz section to import into', 'error');
       } catch (err) {
         addToast(`Import failed: ${err.message}`, 'error');
       }
@@ -185,7 +177,8 @@ export default function QuestionManagement() {
     e.target.value = '';
   };
 
-  const handleExport = (format) => {
+  const handleExport = (quiz) => {
+    const quizQuestions = questionsByQuiz[quiz.id] || [];
     if (!quizQuestions.length) {
       addToast('No questions to export', 'error');
       return;
@@ -204,30 +197,11 @@ export default function QuestionManagement() {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Questions');
-    const fileName = `${selectedQuiz?.title || 'questions'}`.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `${quiz.title}`.replace(/[^a-zA-Z0-9]/g, '_');
 
-    if (format === 'csv') {
-      const csv = XLSX.utils.sheet_to_csv(ws);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${fileName}.csv`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } else {
-      XLSX.writeFile(wb, `${fileName}.xlsx`);
-    }
-
-    addToast(`Exported ${quizQuestions.length} question(s) as ${format.toUpperCase()}`, 'success');
+    XLSX.writeFile(wb, `${fileName}.xlsx`);
+    addToast(`Exported ${quizQuestions.length} question(s)`, 'success');
   };
-
-  const quizOptions = [
-    { value: '', label: '-- Select a Quiz --' },
-    ...quizzes.map(q => ({
-      value: q.id,
-      label: `${q.thumbnail || '📝'} ${q.title} (${questions.filter(qu => qu.quizId === q.id).length} questions)`,
-    })),
-  ];
 
   const diffOptions = [
     { value: 'easy', label: 'Easy' },
@@ -242,146 +216,130 @@ export default function QuestionManagement() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Question Management</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {selectedQuiz
-                ? `${quizQuestions.length} questions in "${selectedQuiz.title}"`
-                : 'Select a quiz to manage its questions'}
+              {questions.length} questions across {quizzes.length} quizzes
             </p>
           </div>
-          <div className="flex gap-2">
-            {selectedQuizId && (
-              <>
-                <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
-                  <FiUpload size={14} /> Import
-                </Button>
-                <div className="relative group">
-                  <Button variant="secondary" size="sm" disabled={!quizQuestions.length}>
-                    <FiDownload size={14} /> Export
-                  </Button>
-                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] hidden group-hover:block z-10">
-                    <button onClick={() => handleExport('xlsx')}
-                      className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      Export as XLSX
-                    </button>
-                    <button onClick={() => handleExport('csv')}
-                      className="block w-full text-left px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      Export as CSV
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-            <Button onClick={openCreate} disabled={!selectedQuizId}>
-              <FiPlus size={16} /> Add Question
-            </Button>
-          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            onChange={handleImport}
+            className="hidden"
+          />
         </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          onChange={handleImport}
-          className="hidden"
-        />
+        <div className="max-w-sm">
+          <Input
+            placeholder="Search questions across all quizzes..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <FiBookOpen size={20} className="text-indigo-500 shrink-0" />
-            <div className="flex-1">
-              <Select
-                value={selectedQuizId}
-                onChange={e => { setSelectedQuizId(e.target.value); setSearch(''); }}
-                options={quizOptions}
-                className="w-full"
-              />
-            </div>
-            {selectedQuiz && (
-              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <Badge variant={selectedQuiz.difficulty}>{selectedQuiz.difficulty}</Badge>
-                <span>{selectedQuiz.totalQuestions || quizQuestions.length} questions</span>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {selectedQuizId && (
-          <div className="max-w-sm">
-            <Input
-              placeholder="Search questions..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-        )}
-
-        {!selectedQuizId ? (
+        {sortedQuizzes.length === 0 ? (
           <EmptyState
             icon={FiBookOpen}
-            title="No quiz selected"
-            description="Select a quiz from the dropdown above to manage its questions. You must create a quiz first before adding questions."
+            title="No quizzes yet"
+            description="Create a quiz first before managing questions."
             action={
               <Button to="/admin/quizzes">
                 <FiPlus size={16} /> Create Quiz
               </Button>
             }
           />
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={FiPlus}
-            title={search ? 'No questions match your search' : 'No questions yet'}
-            description={
-              search
-                ? 'Try a different search term.'
-                : `Add questions to "${selectedQuiz.title}" to get started.`
-            }
-            action={
-              !search ? (
-                <div className="flex gap-2">
-                  <Button onClick={openCreate}><FiPlus size={16} /> Add Question</Button>
-                  <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                    <FiUpload size={16} /> Import from File
-                  </Button>
-                </div>
-              ) : undefined
-            }
-          />
         ) : (
-          <div className="space-y-3">
-            {filtered.map(q => (
-              <Card key={q.id} className="p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">{q.text}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {q.options.map((opt, i) => (
-                        <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                          {opt}
-                        </span>
-                      ))}
+          <div className="space-y-4">
+            {sortedQuizzes.map(quiz => {
+              const quizQs = questionsByQuiz[quiz.id] || [];
+              const filtered = search
+                ? quizQs.filter(x => x.text.toLowerCase().includes(search.toLowerCase()))
+                : quizQs;
+              const isExpanded = expanded[quiz.id] !== false;
+              const hasQuestions = quizQs.length > 0;
+
+              if (search && filtered.length === 0) return null;
+
+              return (
+                <Card key={quiz.id} className="overflow-hidden">
+                  <div
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    onClick={() => toggleQuiz(quiz.id)}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {isExpanded ? <FiChevronDown size={18} className="text-gray-400 shrink-0" /> : <FiChevronRight size={18} className="text-gray-400 shrink-0" />}
+                      <span className="text-lg">{quiz.thumbnail || '📝'}</span>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{quiz.title}</h3>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Badge variant={quiz.difficulty}>{quiz.difficulty}</Badge>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{quiz.category}</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">·</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{quizQs.length} question{quizQs.length !== 1 ? 's' : ''}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant={q.difficulty}>{q.difficulty}</Badge>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || selectedQuiz?.category}</span>
+                    <div className="flex gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+                      {hasQuestions && (
+                        <Button variant="secondary" size="sm" onClick={() => handleExport(quiz)}>
+                          <FiDownload size={14} /> Export
+                        </Button>
+                      )}
+                      <Button size="sm" onClick={() => openCreate(quiz.id)}>
+                        <FiPlus size={14} /> Add Question
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
-                    <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
-                      <FiEdit2 size={14} />
-                    </button>
-                    <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
-                      <FiTrash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              </Card>
-            ))}
+
+                  {isExpanded && (
+                    <div className="border-t border-gray-100 dark:border-gray-700">
+                      {filtered.length === 0 ? (
+                        <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                          {search ? 'No questions match your search' : 'No questions yet. Click "Add Question" to get started.'}
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                          {filtered.map(q => (
+                            <div key={q.id} className="p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">{q.text}</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {q.options.map((opt, i) => (
+                                      <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
+                                        {opt}
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Badge variant={q.difficulty}>{q.difficulty}</Badge>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || quiz.category}</span>
+                                  </div>
+                                </div>
+                                <div className="flex gap-1 shrink-0">
+                                  <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
+                                    <FiEdit2 size={14} />
+                                  </button>
+                                  <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
+                                    <FiTrash2 size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
 
         <Modal isOpen={modal.open} onClose={() => setModal({ open: false })} title={modal.mode === 'create' ? 'Add Question' : 'Edit Question'} size="lg">
           <div className="space-y-4">
             <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-sm text-indigo-700 dark:text-indigo-300">
-              Adding question to: <strong>{selectedQuiz?.title}</strong>
+              {modal.mode === 'create' ? 'Adding question to' : 'Editing question in'}: <strong>{quizzes.find(q => q.id === modal.quizId)?.title}</strong>
             </div>
             <Input label="Question" value={form.text} onChange={e => setForm({ ...form, text: e.target.value })} placeholder="Enter question text" />
             <div className="grid grid-cols-2 gap-3">
