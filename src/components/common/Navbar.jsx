@@ -42,18 +42,6 @@ export default function Navbar() {
             <span className="text-lg font-bold text-gray-900 dark:text-white">QuizMaster</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-              >
-                <link.icon size={16} />
-                {link.label}
-              </Link>
-            ))}
-          </div>
 
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Toggle theme">
