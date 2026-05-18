@@ -349,36 +349,11 @@ export default function Landing() {
       {/* FOOTER */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <Link to="/" className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🧠</span>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">QuizMaster</span>
-              </Link>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4 max-w-[220px]">
-                The modern quiz platform for learners, educators, and teams.
-              </p>
-              <div className="flex items-center gap-2">
-                {[FiGithub, FiGlobe, FiMail].map((Icon, i) => (
-                  <a key={i} href="#" className="w-7 h-7 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
-                    <Icon size={12} />
-                  </a>
-                ))}
-              </div>
-            </div>
-            {[
-              { title: 'Product', links: ['Features', 'Pricing', 'API', 'Integrations'] },
-              { title: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
-              { title: 'Support', links: ['Docs', 'Status', 'Community', 'Help'] },
-            ].map((col, i) => (
-              <div key={i}>
-                <h4 className="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-3">{col.title}</h4>
-                <ul className="space-y-2">
-                  {col.links.map((link, j) => (
-                    <li key={j}><a href="#" className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">{link}</a></li>
-                  ))}
-                </ul>
-              </div>
+          <div className="flex items-center justify-center gap-2">
+            {[FiGithub, FiGlobe, FiMail].map((Icon, i) => (
+              <a key={i} href="#" className="w-7 h-7 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
+                <Icon size={12} />
+              </a>
             ))}
           </div>
           <div className="border-t border-gray-200 dark:border-gray-800 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
