@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS questions (
   text TEXT NOT NULL,
   options JSON NOT NULL,
   correctAnswer INT NOT NULL,
+  type ENUM('multiple', 'truefalse', 'fill') DEFAULT 'multiple',
   category VARCHAR(100) DEFAULT 'General',
   difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
   FOREIGN KEY (quizId) REFERENCES quizzes(id) ON DELETE CASCADE

@@ -12,8 +12,19 @@ import EmptyState from '../../components/common/EmptyState';
 import { useQuiz } from '../../context/QuizContext';
 import { useToast } from '../../components/ui/Toast';
 
-const EXPECTED_HEADERS = ['Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Answer', 'Difficulty'];
+const EXPECTED_HEADERS = ['Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Answer', 'Difficulty', 'Type'];
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
+const QUESTION_TYPES = [
+  { value: 'multiple', label: 'Multiple Choice' },
+  { value: 'truefalse', label: 'True / False' },
+  { value: 'fill', label: 'Fill in the Blank' },
+];
+
+const typeBadgeColors = {
+  multiple: 'blue',
+  truefalse: 'purple',
+  fill: 'orange',
+};
 
 function normalizeHeader(h) {
   if (!h) return '';
@@ -25,6 +36,7 @@ function normalizeHeader(h) {
   if (s === 'optiond' || s === 'option4' || s === 'd') return 'Option D';
   if (s === 'correctanswer' || s === 'correct' || s === 'answer') return 'Correct Answer';
   if (s === 'difficulty' || s === 'level' || s === 'diff') return 'Difficulty';
+  if (s === 'type') return 'Type';
   return h.toString().trim();
 }
 
@@ -35,7 +47,7 @@ export default function QuestionManagement() {
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState({});
   const [modal, setModal] = useState({ open: false, mode: 'create', question: null, quizId: '' });
-  const [form, setForm] = useState({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
+  const [form, setForm] = useState({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', fillAnswer: '', type: 'multiple', difficulty: 'medium' });
 
   const questionsByQuiz = useMemo(() => {
     const map = {};
@@ -55,11 +67,12 @@ export default function QuestionManagement() {
   };
 
   const openCreate = (quizId) => {
-    setForm({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', difficulty: 'medium' });
+    setForm({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', fillAnswer: '', type: 'multiple', difficulty: 'medium' });
     setModal({ open: true, mode: 'create', question: null, quizId });
   };
 
   const openEdit = (q) => {
+    const isFill = q.type === 'fill';
     setForm({
       text: q.text,
       option1: q.options[0] || '',
@@ -67,6 +80,8 @@ export default function QuestionManagement() {
       option3: q.options[2] || '',
       option4: q.options[3] || '',
       correctAnswer: String(q.correctAnswer),
+      fillAnswer: isFill ? (q.options[0] || '') : '',
+      type: q.type || 'multiple',
       difficulty: q.difficulty,
     });
     setModal({ open: true, mode: 'edit', question: q, quizId: q.quizId });
@@ -74,17 +89,33 @@ export default function QuestionManagement() {
 
   const handleSubmit = async () => {
     if (!form.text.trim()) { addToast('Question text is required', 'error'); return; }
-    const options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
-    if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
+
+    let options, correctAnswer;
+
+    if (form.type === 'truefalse') {
+      options = ['True', 'False'];
+      correctAnswer = Number(form.correctAnswer);
+    } else if (form.type === 'fill') {
+      if (!form.fillAnswer.trim()) { addToast('Correct answer is required', 'error'); return; }
+      options = [form.fillAnswer.trim()];
+      correctAnswer = 0;
+    } else {
+      options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
+      if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
+      correctAnswer = Number(form.correctAnswer);
+    }
+
     const quiz = quizzes.find(q => q.id === modal.quizId);
     const data = {
       text: form.text,
       options,
-      correctAnswer: Number(form.correctAnswer),
+      correctAnswer,
+      type: form.type,
       category: quiz?.category || 'General',
       difficulty: form.difficulty,
       quizId: modal.quizId,
     };
+
     if (modal.mode === 'create') {
       await addQuestion(data);
       addToast('Question created', 'success');
@@ -110,6 +141,9 @@ export default function QuestionManagement() {
     const od = row['Option D'] || row['option4'] || '';
     let correct = row['Correct Answer'] ?? row['correctAnswer'] ?? row['correct'] ?? 0;
     const diff = row['Difficulty'] || row['difficulty'] || 'medium';
+    const typeRaw = (row['Type'] || row['type'] || 'multiple').toString().toLowerCase();
+
+    const type = ['truefalse', 'fill'].includes(typeRaw) ? typeRaw : 'multiple';
 
     if (typeof correct === 'string') {
       const uc = correct.toString().trim().toUpperCase();
@@ -117,19 +151,30 @@ export default function QuestionManagement() {
       else if (uc === 'B' || uc === '2') correct = 1;
       else if (uc === 'C' || uc === '3') correct = 2;
       else if (uc === 'D' || uc === '4') correct = 3;
+      else if (uc === 'TRUE') correct = 0;
+      else if (uc === 'FALSE') correct = 1;
       else correct = parseInt(correct) || 0;
     }
     correct = Number(correct);
     if (correct < 0 || correct > 3) correct = 0;
 
     const difficulty = DIFFICULTIES.includes(diff.toString().toLowerCase()) ? diff.toString().toLowerCase() : 'medium';
-    const options = [oa, ob, oc, od].filter(o => o.toString().trim());
-    if (!q.toString().trim() || options.length < 2) return null;
+    let options;
+    if (type === 'truefalse') {
+      options = ['True', 'False'];
+    } else if (type === 'fill') {
+      options = [oa || ob || oc || od || ''];
+    } else {
+      options = [oa, ob, oc, od].filter(o => o.toString().trim());
+    }
+    if (!q.toString().trim()) return null;
+    if (type !== 'fill' && options.length < 2) return null;
 
     return {
       text: q.toString().trim(),
       options,
       correctAnswer: correct,
+      type,
       category: quizzes.find(qu => qu.id === quizId)?.category || 'General',
       difficulty,
       quizId,
@@ -156,7 +201,7 @@ export default function QuestionManagement() {
         const headers = Object.keys(json[0]).map(normalizeHeader);
         const hasRequired = EXPECTED_HEADERS.some(h => headers.includes(h));
         if (!hasRequired) {
-          addToast('Unrecognized format. Expected columns: Question, Option A-D, Correct Answer, Difficulty', 'error');
+          addToast('Unrecognized format. Expected columns: Question, Option A-D, Correct Answer, Difficulty, Type', 'error');
           return;
         }
 
@@ -184,15 +229,19 @@ export default function QuestionManagement() {
       return;
     }
 
-    const data = quizQuestions.map(q => ({
-      Question: q.text,
-      'Option A': q.options[0] || '',
-      'Option B': q.options[1] || '',
-      'Option C': q.options[2] || '',
-      'Option D': q.options[3] || '',
-      'Correct Answer': q.correctAnswer,
-      Difficulty: q.difficulty,
-    }));
+    const data = quizQuestions.map(q => {
+      const isFill = q.type === 'fill';
+      return {
+        Question: q.text,
+        'Option A': q.options[0] || '',
+        'Option B': isFill ? '' : (q.options[1] || ''),
+        'Option C': isFill ? '' : (q.options[2] || ''),
+        'Option D': isFill ? '' : (q.options[3] || ''),
+        'Correct Answer': q.type === 'truefalse' ? (q.correctAnswer === 0 ? 'True' : 'False') : q.correctAnswer,
+        Difficulty: q.difficulty,
+        Type: q.type || 'multiple',
+      };
+    });
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -208,6 +257,12 @@ export default function QuestionManagement() {
     { value: 'medium', label: 'Medium' },
     { value: 'hard', label: 'Hard' },
   ];
+
+  const typeOptions = QUESTION_TYPES;
+
+  const correctOptions = form.type === 'truefalse'
+    ? [{ value: '0', label: 'True' }, { value: '1', label: 'False' }]
+    : [{ value: '0', label: 'Option 1' }, { value: '1', label: 'Option 2' }, { value: '2', label: 'Option 3' }, { value: '3', label: 'Option 4' }];
 
   return (
     <AdminLayout>
@@ -298,34 +353,46 @@ export default function QuestionManagement() {
                         </div>
                       ) : (
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                          {filtered.map(q => (
-                            <div key={q.id} className="p-4">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">{q.text}</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {q.options.map((opt, i) => (
-                                      <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                                        {opt}
-                                      </span>
-                                    ))}
+                          {filtered.map(q => {
+                            const isFill = q.type === 'fill';
+                            return (
+                              <div key={q.id} className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white">{q.text}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {isFill ? (
+                                        <span className="px-2 py-1 text-xs rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                          Answer: {q.options[0]}
+                                        </span>
+                                      ) : (
+                                        q.options.map((opt, i) => (
+                                          <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
+                                            {opt}
+                                          </span>
+                                        ))
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <Badge variant={(typeBadgeColors[q.type] || 'blue')}>{q.type || 'multiple'}</Badge>
+                                      <Badge variant={q.difficulty}>{q.difficulty}</Badge>
+                                      <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || quiz.category}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <Badge variant={q.difficulty}>{q.difficulty}</Badge>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || quiz.category}</span>
+                                  <div className="flex gap-1 shrink-0">
+                                    <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
+                                      <FiEdit2 size={14} />
+                                    </button>
+                                    <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
+                                      <FiTrash2 size={14} />
+                                    </button>
                                   </div>
-                                </div>
-                                <div className="flex gap-1 shrink-0">
-                                  <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
-                                    <FiEdit2 size={14} />
-                                  </button>
-                                  <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
-                                    <FiTrash2 size={14} />
-                                  </button>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -343,16 +410,32 @@ export default function QuestionManagement() {
             </div>
             <Input label="Question" value={form.text} onChange={e => setForm({ ...form, text: e.target.value })} placeholder="Enter question text" />
             <div className="grid grid-cols-2 gap-3">
-              <Input label="Option 1" value={form.option1} onChange={e => setForm({ ...form, option1: e.target.value })} placeholder="Option A" />
-              <Input label="Option 2" value={form.option2} onChange={e => setForm({ ...form, option2: e.target.value })} placeholder="Option B" />
-              <Input label="Option 3" value={form.option3} onChange={e => setForm({ ...form, option3: e.target.value })} placeholder="Option C" />
-              <Input label="Option 4" value={form.option4} onChange={e => setForm({ ...form, option4: e.target.value })} placeholder="Option D" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Select label="Correct Answer" value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })}
-                options={[{ value: '0', label: 'Option 1' }, { value: '1', label: 'Option 2' }, { value: '2', label: 'Option 3' }, { value: '3', label: 'Option 4' }]} />
+              <Select label="Question Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} options={typeOptions} />
               <Select label="Difficulty" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })} options={diffOptions} />
             </div>
+
+            {form.type === 'multiple' && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="Option 1" value={form.option1} onChange={e => setForm({ ...form, option1: e.target.value })} placeholder="Option A" />
+                  <Input label="Option 2" value={form.option2} onChange={e => setForm({ ...form, option2: e.target.value })} placeholder="Option B" />
+                  <Input label="Option 3" value={form.option3} onChange={e => setForm({ ...form, option3: e.target.value })} placeholder="Option C" />
+                  <Input label="Option 4" value={form.option4} onChange={e => setForm({ ...form, option4: e.target.value })} placeholder="Option D" />
+                </div>
+                <Select label="Correct Answer" value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })}
+                  options={correctOptions} />
+              </>
+            )}
+
+            {form.type === 'truefalse' && (
+              <Select label="Correct Answer" value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })}
+                options={correctOptions} />
+            )}
+
+            {form.type === 'fill' && (
+              <Input label="Correct Answer" value={form.fillAnswer} onChange={e => setForm({ ...form, fillAnswer: e.target.value })} placeholder="Enter the correct answer" />
+            )}
+
             <Button onClick={handleSubmit} className="w-full">{modal.mode === 'create' ? 'Add Question' : 'Save Changes'}</Button>
           </div>
         </Modal>

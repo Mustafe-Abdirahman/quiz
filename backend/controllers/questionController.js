@@ -23,17 +23,18 @@ export async function getQuestionsByQuizId(req, res) {
 
 export async function createQuestion(req, res) {
   try {
-    const { text, options, correctAnswer, category, difficulty, quizId } = req.body;
+    const { text, options, correctAnswer, type, category, difficulty, quizId } = req.body;
     if (!text || !text.trim()) {
       return res.status(400).json({ success: false, message: 'Question text is required' });
     }
-    if (!options || options.length < 2) {
+    const qType = type || 'multiple';
+    if (qType !== 'fill' && (!options || options.length < 2)) {
       return res.status(400).json({ success: false, message: 'At least 2 options required' });
     }
     const id = crypto.randomUUID();
     await pool.query(
-      'INSERT INTO questions (id, quizId, text, options, correctAnswer, category, difficulty) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [id, quizId || null, text, JSON.stringify(options), Number(correctAnswer), category || 'General', difficulty || 'medium']
+      'INSERT INTO questions (id, quizId, text, options, correctAnswer, type, category, difficulty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, quizId || null, text, JSON.stringify(options), Number(correctAnswer), qType, category || 'General', difficulty || 'medium']
     );
     const [rows] = await pool.query('SELECT * FROM questions WHERE id = ?', [id]);
     const question = { ...rows[0], options: typeof rows[0].options === 'string' ? JSON.parse(rows[0].options) : rows[0].options };
@@ -45,10 +46,10 @@ export async function createQuestion(req, res) {
 
 export async function updateQuestion(req, res) {
   try {
-    const { text, options, correctAnswer, category, difficulty, quizId } = req.body;
+    const { text, options, correctAnswer, type, category, difficulty, quizId } = req.body;
     await pool.query(
-      'UPDATE questions SET text = ?, options = ?, correctAnswer = ?, category = ?, difficulty = ?, quizId = ? WHERE id = ?',
-      [text, JSON.stringify(options), Number(correctAnswer), category, difficulty, quizId || null, req.params.id]
+      'UPDATE questions SET text = ?, options = ?, correctAnswer = ?, type = ?, category = ?, difficulty = ?, quizId = ? WHERE id = ?',
+      [text, JSON.stringify(options), Number(correctAnswer), type || 'multiple', category, difficulty, quizId || null, req.params.id]
     );
     res.json({ success: true });
   } catch {
