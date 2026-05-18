@@ -1,70 +1,88 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiClock, FiCheckCircle, FiStar, FiLayers, FiPlay, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiHeart, FiChevronRight, FiSun, FiMoon } from 'react-icons/fi';
+import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiCheckCircle, FiStar, FiClock, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiSun, FiMoon, FiPlay, FiChevronRight, FiLayers, FiTarget, FiDollarSign } from 'react-icons/fi';
 import Button from '../components/ui/Button';
 import { useTheme } from '../context/ThemeContext';
 
 const features = [
-  { icon: FiZap, title: 'Solo Mode', desc: 'Test your knowledge with timed quizzes across multiple categories with instant feedback and detailed explanations.', gradient: 'from-amber-500 to-orange-600' },
-  { icon: FiUsers, title: 'Multiplayer', desc: 'Compete with friends in real-time. Up to 8 players per room with live scoreboards and exciting race modes.', gradient: 'from-indigo-500 to-purple-600' },
-  { icon: FiAward, title: 'Leaderboards', desc: 'Track your global ranking, compare scores with peers, and earn badges for achievements and milestones.', gradient: 'from-emerald-500 to-teal-600' },
-  { icon: FiBarChart2, title: 'Analytics', desc: 'Deep insights into your performance with visual charts, progress tracking, and personalized improvement tips.', gradient: 'from-blue-500 to-cyan-600' },
-  { icon: FiShield, title: 'Admin Panel', desc: 'Full control over quizzes, questions, and users with granular permissions and real-time moderation tools.', gradient: 'from-rose-500 to-pink-600' },
-  { icon: FiRefreshCw, title: 'Import & Export', desc: 'Bulk import questions via XLSX, export results, and seamlessly migrate content between quizzes and platforms.', gradient: 'from-violet-500 to-fuchsia-600' },
-];
-
-const stats = [
-  { value: '12K+', label: 'Active Learners', icon: FiUsers },
-  { value: '800+', label: 'Quizzes Created', icon: FiBookOpen },
-  { value: '75K+', label: 'Questions Answered', icon: FiTrendingUp },
-  { value: '4.9', label: 'Average Rating', icon: FiStar },
-];
-
-const steps = [
-  { num: '01', title: 'Create an Account', desc: 'Sign up in seconds and set up your profile. No credit card required.', color: 'from-indigo-500 to-purple-600' },
-  { num: '02', title: 'Pick Your Quiz', desc: 'Browse hundreds of quizzes across science, history, tech, sports, and more.', color: 'from-purple-500 to-pink-600' },
-  { num: '03', title: 'Start Playing', desc: 'Answer questions against the clock, earn points, and climb the leaderboard.', color: 'from-pink-500 to-rose-600' },
+  {
+    icon: FiZap, title: 'Solo Practice',
+    desc: 'Sharpen your skills with timed quizzes across science, history, tech, sports, and more. Get instant feedback with detailed explanations for every answer.',
+    gradient: 'from-indigo-500 to-blue-600',
+    stat: '15K+ quizzes',
+  },
+  {
+    icon: FiUsers, title: 'Live Multiplayer',
+    desc: 'Challenge friends or strangers in real-time quiz battles. Up to 8 players per room with voice chat, reactions, and live scoreboards.',
+    gradient: 'from-purple-500 to-pink-600',
+    stat: '2K+ rooms daily',
+  },
+  {
+    icon: FiBarChart2, title: 'Deep Analytics',
+    desc: 'Track every answer, identify weak spots, and watch your improvement over time with beautiful charts and personalized recommendations.',
+    gradient: 'from-emerald-500 to-teal-600',
+    stat: '94% improvement',
+  },
+  {
+    icon: FiShield, title: 'Admin Tools',
+    desc: 'Full control over content and users. Import questions via XLSX, moderate rooms, manage permissions, and generate performance reports.',
+    gradient: 'from-rose-500 to-orange-600',
+    stat: 'Used in 500+ schools',
+  },
+  {
+    icon: FiAward, title: 'Global Rankings',
+    desc: 'Compete on worldwide leaderboards, earn badges and achievements, and track your progress across different categories and difficulty levels.',
+    gradient: 'from-amber-500 to-yellow-600',
+    stat: '10K+ active players',
+  },
+  {
+    icon: FiRefreshCw, title: 'Import & Export',
+    desc: 'Bulk import question banks from XLSX, export results for analysis, and seamlessly migrate content between quizzes and platforms.',
+    gradient: 'from-violet-500 to-fuchsia-600',
+    stat: '50K+ questions',
+  },
 ];
 
 const testimonials = [
-  { name: 'Sarah Chen', role: 'High School Teacher', avatar: 'SC', gradient: 'from-indigo-500 to-purple-600', quote: 'QuizMaster transformed my classroom. Student engagement is at an all-time high and test scores have improved dramatically.' },
-  { name: 'Marcus Johnson', role: 'Engineering Manager', avatar: 'MJ', gradient: 'from-emerald-500 to-teal-600', quote: 'We use QuizMaster for weekly team-building. The multiplayer mode keeps remote teams connected and competitive.' },
-  { name: 'Priya Patel', role: 'Content Creator', avatar: 'PP', gradient: 'from-rose-500 to-pink-600', quote: 'The analytics and question management save me hours every week. The import/export feature is a lifesaver.' },
-  { name: 'Alex Kim', role: 'University Student', avatar: 'AK', gradient: 'from-cyan-500 to-blue-600', quote: 'Finally, a quiz app that makes studying fun. The instant feedback helps me learn from my mistakes right away.' },
-  { name: 'Lisa Thompson', role: 'Corporate Trainer', avatar: 'LT', gradient: 'from-amber-500 to-orange-600', quote: 'We rolled out QuizMaster across our entire org for compliance training. Adoption was 94% in the first week.' },
-  { name: 'David Rivera', role: 'Quiz Enthusiast', avatar: 'DR', gradient: 'from-violet-500 to-fuchsia-600', quote: 'I spend hours on QuizMaster every week. The variety of topics and the competitive aspect keep me coming back.' },
+  { name: 'Sarah Chen', role: 'Teacher', initials: 'SC', color: 'bg-indigo-500', quote: 'My students beg to play QuizMaster. Engagement went through the roof and test scores followed. It\'s become an essential part of my curriculum.' },
+  { name: 'Marcus Johnson', role: 'Engineering Lead', initials: 'MJ', color: 'bg-emerald-500', quote: 'We replaced our weekly trivia Slack bot with QuizMaster multiplayer. The team loves the real-time competition and it\'s done wonders for remote morale.' },
+  { name: 'Priya Patel', role: 'Content Creator', initials: 'PP', color: 'bg-rose-500', quote: 'The bulk import feature alone saves me hours every week. I manage over 2,000 questions across 40+ quizzes and it handles everything flawlessly.' },
+  { name: 'Alex Kim', role: 'Med Student', initials: 'AK', color: 'bg-cyan-500', quote: 'QuizMaster changed how I study. Flash cards felt passive — this is active recall with stakes. My retention has improved dramatically since I started.' },
+  { name: 'Lisa Thompson', role: 'HR Director', initials: 'LT', color: 'bg-amber-500', quote: 'Rolled this out for company-wide compliance training. 94% completion in the first week and people actually enjoyed it. That\'s unheard of.' },
+  { name: 'David Rivera', role: 'Trivia Host', initials: 'DR', color: 'bg-violet-500', quote: 'I host weekly pub trivia nights on QuizMaster. The variety of categories and question types keeps my regulars coming back every single week.' },
+];
+
+const faqs = [
+  { q: 'Is QuizMaster free?', a: 'Yes! The Starter plan is free forever with unlimited solo quizzes and basic analytics. Upgrade for multiplayer and advanced features.' },
+  { q: 'Can I create my own quizzes?', a: 'Absolutely. You can create custom quizzes with multiple choice, true/false, and fill-in-the-blank questions. Bulk import via XLSX is supported.' },
+  { q: 'How does multiplayer work?', a: 'Create or join a room with a unique code. Up to 8 players answer the same questions in real-time with a live scoreboard and countdown timer.' },
 ];
 
 export default function Landing() {
   const { dark, toggleTheme } = useTheme();
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
 
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-50 bg-white/70 dark:bg-gray-950/70 backdrop-blur-xl border-b border-gray-100/50 dark:border-gray-800/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <span className="text-2xl transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">🧠</span>
-              <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">QuizMaster</span>
-              </div>
+      {/* NAV */}
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center gap-2.5">
+              <span className="text-xl">🧠</span>
+              <span className="text-base font-bold text-gray-900 dark:text-white tracking-tight">QuizMaster</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              {['Features', 'How It Works', 'Testimonials'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors relative group">
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 group-hover:w-full transition-all duration-300" />
-                </a>
-              ))}
-            </nav>
-            <div className="flex items-center gap-2">
-              <button onClick={toggleTheme} className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200" title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
-                {dark ? <FiSun size={16} /> : <FiMoon size={16} />}
+            <nav className="hidden md:flex items-center gap-6">
+              <a href="#features" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Features</a>
+              <a href="#testimonials" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Testimonials</a>
+              <a href="#faq" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">FAQ</a>
+              <span className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
+              <button onClick={toggleTheme} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                {dark ? <FiSun size={15} /> : <FiMoon size={15} />}
               </button>
-              <div className="h-5 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
-              <Link to="/login" className="hidden sm:inline-flex text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Log in</Link>
-              <Button to="/register" size="sm" className="!rounded-full shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all duration-300">
-                Get Started
+            </nav>
+            <div className="flex items-center gap-2.5">
+              <Link to="/login" className="hidden sm:inline text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Log in</Link>
+              <Button to="/register" size="sm" className="!rounded-lg">
+                Sign up free
                 <FiArrowRight size={14} />
               </Button>
             </div>
@@ -73,193 +91,115 @@ export default function Landing() {
       </header>
 
       {/* HERO */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-100 via-white to-transparent dark:from-indigo-950/40 dark:via-gray-950 dark:to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-100 via-transparent to-transparent dark:from-purple-950/30 dark:via-transparent dark:to-transparent" />
-          <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-400/20 dark:bg-indigo-500/10 rounded-full blur-[128px]" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/20 dark:bg-purple-500/10 rounded-full blur-[128px]" />
-          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-pink-400/20 dark:bg-pink-500/10 rounded-full blur-[96px]" />
-        </div>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/80 to-white dark:from-indigo-950/20 dark:to-gray-950" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-indigo-200/40 to-transparent dark:from-indigo-800/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-purple-200/30 to-transparent dark:from-purple-800/10 rounded-full blur-3xl" />
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-0">
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full text-sm font-medium text-white shadow-lg shadow-indigo-500/25 mb-6 animate-fadeIn">
-                <FiZap size={14} />
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-                </span>
-                Now available for everyone
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-[1.05] tracking-tight">
-                Master your knowledge with{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400">interactive quizzes</span>
-              </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-lg">
-                The all-in-one platform for learners, educators, and teams. Create, share, and compete in real-time with stunning analytics and seamless multiplayer.
-              </p>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <Button to="/register" size="lg" className="!rounded-full !px-8 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5">
-                  Start Free
-                  <FiArrowRight size={18} />
-                </Button>
-                <Button to="/login" variant="outline" size="lg" className="!rounded-full !px-8">
-                  <FiPlay size={16} />
-                  Watch Demo
-                </Button>
-              </div>
-              <div className="flex flex-wrap items-center gap-6 mt-8 text-sm">
-                {['No credit card required', 'Free forever', 'Instant access', 'Cancel anytime'].map((text, i) => (
-                  <span key={i} className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                    <FiCheckCircle size={14} className="text-emerald-500 shrink-0" />
-                    {text}
-                  </span>
-                ))}
-              </div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-28 md:pt-28 md:pb-36">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-xs font-medium text-gray-600 dark:text-gray-300 mb-6 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Now in public beta
             </div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] tracking-tight mb-5">
+              Learn, compete, and{' '}
+              <span className="relative">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">master knowledge</span>
+                <span className="absolute -bottom-1 left-0 right-0 h-3 bg-indigo-200/40 dark:bg-indigo-700/30 -rotate-1 rounded" />
+              </span>
+              <br />with interactive quizzes
+            </h1>
+            <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-lg mx-auto mb-8 leading-relaxed">
+              The modern platform for creating, sharing, and competing in real-time quizzes. Used by students, teachers, and teams worldwide.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button to="/register" size="lg" className="!rounded-xl !px-8 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all duration-300">
+                Get started free
+                <FiArrowRight size={18} />
+              </Button>
+              <Button to="/login" variant="outline" size="lg" className="!rounded-xl !px-8">
+                <FiPlay size={16} />
+                See how it works
+              </Button>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 mt-8 text-xs text-gray-400 dark:text-gray-500">
+              <span className="flex items-center gap-1.5"><FiCheckCircle size={12} className="text-emerald-500" /> No credit card</span>
+              <span className="flex items-center gap-1.5"><FiCheckCircle size={12} className="text-emerald-500" /> Free forever</span>
+              <span className="flex items-center gap-1.5"><FiCheckCircle size={12} className="text-emerald-500" /> Cancel anytime</span>
+            </div>
+          </div>
 
-            {/* HERO CARD */}
-            <div className="hidden lg:flex justify-center">
-              <div className="relative group perspective-1000">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl opacity-40 group-hover:opacity-60 blur-xl transition-opacity duration-500" />
-                <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-1 group-hover:-translate-y-1 transition-transform duration-500">
-                  <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/80 rounded-2xl p-1">
-                    <div className="p-6">
-                      <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100 dark:border-gray-800">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20">Q</div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">General Knowledge</p>
-                          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <span>8 questions</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-                            <span>Medium</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Live</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex -space-x-2">
-                          {['SC', 'MJ', 'PP'].map((init, i) => (
-                            <div key={i} className={`w-7 h-7 rounded-full bg-gradient-to-br ${['from-indigo-500 to-purple-600', 'from-emerald-500 to-teal-600', 'from-rose-500 to-pink-600'][i]} flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-900`}>
-                              {init}
-                            </div>
-                          ))}
-                          <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400 ring-2 ring-white dark:ring-gray-900">+5</div>
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">8 players competing</span>
-                      </div>
-
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-4">What is the chemical symbol for water?</p>
-                      <div className="space-y-2.5">
-                        {[
-                          { text: 'H₂O', correct: true },
-                          { text: 'CO₂', correct: false },
-                          { text: 'NaCl', correct: false },
-                          { text: 'O₂', correct: false },
-                        ].map((opt, i) => (
-                          <div key={i} className={`flex items-center gap-3 p-3.5 rounded-2xl text-sm font-medium transition-all duration-200 ${
-                            opt.correct
-                              ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-300 dark:ring-emerald-700'
-                              : 'bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                          }`}>
-                            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                              opt.correct
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                            }`}>
-                              {String.fromCharCode(65 + i)}
-                            </span>
-                            <span className="flex-1">{opt.text}</span>
-                            {opt.correct && (
-                              <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                                <FiCheckCircle size={11} className="text-white" />
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                          <FiClock size={12} />
-                          <span>0:42 remaining</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                          <FiZap size={12} />
-                          <span>+10 pts</span>
-                        </div>
-                      </div>
+          {/* HERO VISUAL */}
+          <div className="mt-16 max-w-4xl mx-auto">
+            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                <span className="ml-2 text-[11px] text-gray-400 font-mono">quizmaster.app/play/general-knowledge</span>
+              </div>
+              <div className="p-5 sm:p-7">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">Q</div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">General Knowledge</p>
+                      <p className="text-xs text-gray-500">8 questions · Medium</p>
                     </div>
                   </div>
+                  <div className="hidden sm:flex items-center -space-x-1.5">
+                    {['SC', 'MJ', 'PP', 'AK'].map((init, i) => (
+                      <div key={i} className={`w-7 h-7 rounded-full ${['bg-indigo-500', 'bg-emerald-500', 'bg-rose-500', 'bg-amber-500'][i]} flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white dark:ring-gray-900`}>{init}</div>
+                    ))}
+                    <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] font-bold text-gray-400 ring-2 ring-white dark:ring-gray-900">+4</div>
+                  </div>
                 </div>
-
-                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-xl flex items-center justify-center text-2xl animate-bounce shadow-amber-500/30" style={{ animationDuration: '3s' }}>🏆</div>
-                <div className="absolute -top-4 -right-4 w-14 h-14 bg-gradient-to-br from-rose-400 to-pink-500 rounded-2xl shadow-xl flex items-center justify-center text-xl animate-bounce shadow-rose-500/30" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}>⚡</div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">What is the chemical symbol for water?</p>
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {['H₂O', 'CO₂', 'NaCl', 'O₂'].map((opt, i) => (
+                    <div key={i} className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium border transition-colors ${
+                      i === 0
+                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
+                    }`}>
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                        i === 0 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-500'
+                      }`}>{String.fromCharCode(65 + i)}</span>
+                      <span className="flex-1">{opt}</span>
+                      {i === 0 && <FiCheckCircle size={13} className="text-emerald-500" />}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-400">
+                  <span className="flex items-center gap-1"><FiClock size={12} /> 0:42 remaining</span>
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1"><FiUsers size={12} /> 8 playing</span>
+                    <span className="font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1"><FiZap size={12} /> +10 pts</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-950 to-transparent" />
       </section>
 
-      {/* STATS BANNER */}
-      <section className="relative -mt-16 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-gray-800/50 p-8 md:p-12 hover:shadow-[0_8px_40px_-8px_rgba(99,102,241,0.15)] dark:hover:shadow-[0_8px_40px_-8px_rgba(99,102,241,0.08)] transition-shadow duration-500">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {stats.map((s, i) => (
-                <div key={i} className="text-center group">
-                  <div className="inline-flex p-3 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl text-indigo-600 dark:text-indigo-400 mb-4 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-sm">
-                    <s.icon size={20} />
-                  </div>
-                  <p className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-1 tracking-tight">{s.value}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{s.label}</p>
+      {/* STATS */}
+      <section className="py-16 -mt-8 relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { value: '12K+', label: 'Active users', icon: FiUsers },
+              { value: '800+', label: 'Quizzes', icon: FiTarget },
+              { value: '50K+', label: 'Questions', icon: FiLayers },
+              { value: '4.9', label: 'Rating', icon: FiStar },
+            ].map((s, i) => (
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 text-center hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors">
+                <div className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 mb-3">
+                  <s.icon size={16} />
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-full text-sm font-medium text-white shadow-lg shadow-violet-500/25 mb-4">
-              <FiLayers size={14} />
-              Simple workflow
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-              Get started in{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">three steps</span>
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              From zero to quizzing in under a minute. Simple enough for anyone.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {steps.map((step, i) => (
-              <div key={i} className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-transparent dark:from-gray-900/50 dark:to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative p-8 text-center">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} text-white text-xl font-bold shadow-lg mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500`}>
-                    {step.num}
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{step.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
-                </div>
-                {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/3 -right-4 text-gray-300 dark:text-gray-700">
-                    <FiChevronRight size={24} />
-                  </div>
-                )}
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{s.value}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -267,31 +207,56 @@ export default function Landing() {
       </section>
 
       {/* FEATURES */}
-      <section id="features" className="py-20 md:py-28 bg-gray-50/80 dark:bg-gray-900/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full text-sm font-medium text-white shadow-lg shadow-indigo-500/25 mb-4">
-              <FiZap size={14} />
-              Everything you need
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-              Powerful features for<br />{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">modern learning</span>
+      <section id="features" className="py-20 md:py-28">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-xl mb-16">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3">Features</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
+              Everything you need to{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">learn and compete</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              From solo practice to team competitions, every tool you need in one platform.
+            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+              From solo practice to team competitions, QuizMaster provides a complete toolkit for creating, sharing, and playing quizzes.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((feat, i) => (
-              <div key={i} className="group relative bg-white dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-800 p-7 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 dark:hover:border-indigo-800/50 transition-all duration-500 hover:-translate-y-1 overflow-hidden">
-                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feat.gradient} opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.06] transition-opacity duration-500`} />
-                <div className="relative">
-                  <div className={`inline-flex p-3.5 rounded-2xl bg-gradient-to-br ${feat.gradient} text-white shadow-lg shadow-${feat.gradient.split(' ')[0].replace('from-', '')}/20 mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500`}>
-                    <feat.icon size={22} />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2.5">{feat.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{feat.desc}</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((f, i) => (
+              <div key={i} className="relative group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${f.gradient} flex items-center justify-center text-white shadow-sm mb-4 group-hover:scale-105 transition-transform duration-300`}>
+                  <f.icon size={18} />
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{f.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-3">{f.desc}</p>
+                <span className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">{f.stat}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="py-20 md:py-28 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-xl mb-16">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3">How it works</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
+              Three steps to start
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+              Getting started takes less than a minute. Sign up, pick a quiz, and start playing immediately — no setup required.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+            {[
+              { num: '01', title: 'Create your account', desc: 'Sign up with email or Google. Set up your profile and choose your interests to get personalized recommendations.', color: 'from-indigo-500 to-blue-600' },
+              { num: '02', title: 'Find or create a quiz', desc: 'Browse 800+ community quizzes or build your own with our powerful editor. Import questions from XLSX in seconds.', color: 'from-purple-500 to-pink-600' },
+              { num: '03', title: 'Play and track progress', desc: 'Answer timed questions, earn points, review detailed feedback, and watch your stats improve over time with analytics.', color: 'from-emerald-500 to-teal-600' },
+            ].map((step, i) => (
+              <div key={i} className="flex gap-4 md:flex-col md:gap-3">
+                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center text-white font-bold text-xs md:text-sm shadow-md shrink-0`}>{step.num}</div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1.5 mt-1">{step.title}</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -301,37 +266,57 @@ export default function Landing() {
 
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-20 md:py-28 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full text-sm font-medium text-white shadow-lg shadow-amber-500/25 mb-4">
-              <FiHeart size={14} />
-              Loved by thousands
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-              What our{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600 dark:from-amber-400 dark:to-orange-400">users</span> say
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-xl mb-16">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3">Testimonials</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
+              Loved by{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">thousands</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Real feedback from real people who use QuizMaster every day.
+            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+              Hear from the educators, professionals, and learners who use QuizMaster every day.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {testimonials.map((t, i) => (
-              <div key={i} className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 hover:shadow-md transition-shadow duration-300">
                 <div className="flex items-center gap-0.5 text-amber-400 mb-4">
-                  {[...Array(5)].map((_, s) => <FiStar key={s} size={14} className="fill-amber-400" />)}
+                  {[...Array(5)].map((_, s) => <FiStar key={s} size={12} className="fill-amber-400" />)}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-xs font-bold text-white shadow-lg`}>
-                    {t.avatar}
-                  </div>
+                  <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-xs font-bold text-white`}>{t.initials}</div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{t.role}</p>
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white">{t.name}</p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400">{t.role}</p>
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-20 md:py-28 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-xl mx-auto mb-14">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3">FAQ</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
+              Frequently asked questions
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {faqs.map((item, i) => (
+              <details key={i} className="group bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 open:border-indigo-200 dark:open:border-indigo-800 transition-colors">
+                <summary className="flex items-center justify-between px-5 py-4 text-sm font-medium text-gray-900 dark:text-white cursor-pointer list-none">
+                  {item.q}
+                  <FiChevronRight size={15} className="text-gray-400 group-open:rotate-90 transition-transform duration-200" />
+                </summary>
+                <div className="px-5 pb-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.a}</p>
+                </div>
+              </details>
             ))}
           </div>
         </div>
@@ -339,83 +324,70 @@ export default function Landing() {
 
       {/* CTA */}
       <section className="relative overflow-hidden py-20 md:py-28">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-900/90 dark:via-purple-900/90 dark:to-pink-900/90" />
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-indigo-400/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-400/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium text-white mb-6">
-            <FiStar size={14} />
-            Join 12,000+ active learners
-          </div>
-          <h2 className="text-3xl md:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
-            Ready to challenge<br />yourself?
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-950 dark:from-black dark:to-gray-950" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="relative max-w-2xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
+            Start mastering today
           </h2>
-          <p className="text-lg text-indigo-200 mb-10 max-w-lg mx-auto leading-relaxed">
-            Join thousands of users already mastering their knowledge. Start your journey today — it&apos;s free.
+          <p className="text-gray-400 text-sm leading-relaxed max-w-md mx-auto mb-8">
+            Join 12,000+ active learners. Create your free account in under a minute — no credit card required.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button to="/register" size="lg" className="!rounded-full !bg-white !text-indigo-700 hover:!bg-indigo-50 !shadow-2xl !shadow-indigo-900/25 !px-10 hover:-translate-y-0.5 transition-all duration-300">
-              Get Started Free
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button to="/register" size="lg" className="!rounded-xl !bg-white !text-gray-900 hover:!bg-gray-100 !shadow-2xl !shadow-indigo-900/20 !px-8 transition-all duration-300">
+              Get started free
               <FiArrowRight size={18} />
             </Button>
-            <Button to="/login" size="lg" className="!rounded-full !bg-transparent !text-white !border-2 !border-white/30 hover:!border-white/50 hover:!bg-white/10 !px-8">
-              Sign In
+            <Button to="/login" size="lg" className="!rounded-xl !bg-transparent !text-white !border !border-white/20 hover:!border-white/40 hover:!bg-white/5 !px-8">
+              Sign in
             </Button>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-gray-950 dark:bg-black border-t border-gray-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid md:grid-cols-4 gap-10">
-            <div className="md:col-span-2 lg:col-span-1">
-              <Link to="/" className="flex items-center gap-2.5 mb-5 group">
-                <span className="text-2xl transition-transform duration-300 group-hover:scale-110">🧠</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">QuizMaster</span>
+      <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="md:col-span-1">
+              <Link to="/" className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🧠</span>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">QuizMaster</span>
               </Link>
-              <p className="text-sm text-gray-400 leading-relaxed mb-6 max-w-xs">
-                The ultimate quiz platform for learners, educators, and teams. Create, share, and compete in real-time.
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4 max-w-[220px]">
+                The modern quiz platform for learners, educators, and teams.
               </p>
-              <div className="flex items-center gap-3">
-                {[
-                  { icon: FiGithub, href: 'https://github.com' },
-                  { icon: FiGlobe, href: '#' },
-                  { icon: FiMail, href: 'mailto:hello@quizmaster.app' },
-                ].map((item, i) => (
-                  <a key={i} href={item.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl bg-gray-800/80 hover:bg-gradient-to-br hover:from-indigo-600 hover:to-purple-600 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300">
-                    <item.icon size={15} />
+              <div className="flex items-center gap-2">
+                {[FiGithub, FiGlobe, FiMail].map((Icon, i) => (
+                  <a key={i} href="#" className="w-7 h-7 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
+                    <Icon size={12} />
                   </a>
                 ))}
               </div>
             </div>
             {[
-              { title: 'Product', links: ['Features', 'Pricing', 'Integrations', 'API', 'Changelog'] },
-              { title: 'Company', links: ['About', 'Blog', 'Careers', 'Press', 'Contact'] },
-              { title: 'Support', links: ['Help Center', 'Documentation', 'Status', 'Community', 'Tutorials'] },
+              { title: 'Product', links: ['Features', 'Pricing', 'API', 'Integrations'] },
+              { title: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
+              { title: 'Support', links: ['Docs', 'Status', 'Community', 'Help'] },
             ].map((col, i) => (
               <div key={i}>
-                <h4 className="text-sm font-semibold text-white/90 mb-5">{col.title}</h4>
-                <ul className="space-y-3">
+                <h4 className="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-3">{col.title}</h4>
+                <ul className="space-y-2">
                   {col.links.map((link, j) => (
-                    <li key={j}>
-                      <a href="#" className="text-sm text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-0.5 inline-block">{link}</a>
-                    </li>
+                    <li key={j}><a href="#" className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">{link}</a></li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div className="border-t border-gray-800/50 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">&copy; 2026 QuizMaster, Inc. All rights reserved.</p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">Privacy Policy</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">Terms of Service</a>
-              <Link to="/login" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">Log in</Link>
-              <Link to="/register" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors font-medium">Get Started</Link>
+          <div className="border-t border-gray-200 dark:border-gray-800 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-[11px] text-gray-400">&copy; 2026 QuizMaster. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</a>
+              <a href="#" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Terms</a>
+              <Link to="/login" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Log in</Link>
+              <Link to="/register" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors font-medium">Get started</Link>
             </div>
           </div>
         </div>
