@@ -8,9 +8,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const session = authService.getSession();
-    if (session) setUser(session);
-    setLoading(false);
+    async function load() {
+      const session = authService.getSession();
+      if (session) {
+        const refreshed = await authService.refreshSession();
+        if (refreshed.success) setUser(refreshed.user);
+        else setUser(session);
+      }
+      setLoading(false);
+    }
+    load();
   }, []);
 
   const login = useCallback(async (email, password) => {

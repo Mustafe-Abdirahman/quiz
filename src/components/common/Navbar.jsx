@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiSun, FiMoon, FiLogOut, FiUser, FiGrid } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon, FiLogOut, FiUser, FiGrid, FiBookOpen, FiFileText, FiMonitor, FiAward } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -19,14 +19,17 @@ export default function Navbar() {
     ? [
         { to: '/admin/dashboard', label: 'Dashboard', icon: FiGrid },
         { to: '/admin/users', label: 'Users', icon: FiUser },
-        { to: '/admin/quizzes', label: 'Quizzes', icon: FiGrid },
-        { to: '/admin/rooms', label: 'Rooms', icon: FiGrid },
+        { to: '/admin/quizzes', label: 'Quizzes', icon: FiBookOpen },
+        { to: '/admin/questions', label: 'Questions', icon: FiFileText },
+        { to: '/admin/rooms', label: 'Rooms', icon: FiMonitor },
+        { to: '/admin/competition', label: 'Monitor', icon: FiAward },
       ]
     : user
       ? [
           { to: '/user/dashboard', label: 'Dashboard', icon: FiGrid },
-          { to: '/user/quizzes', label: 'Quizzes', icon: FiGrid },
-          { to: '/user/rooms', label: 'Rooms', icon: FiGrid },
+          { to: '/user/quizzes', label: 'Quizzes', icon: FiBookOpen },
+          { to: '/user/rooms', label: 'Rooms', icon: FiMonitor },
+          { to: '/user/leaderboard', label: 'Leaderboard', icon: FiAward },
         ]
       : [];
 
