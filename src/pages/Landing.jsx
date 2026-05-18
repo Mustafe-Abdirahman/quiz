@@ -348,7 +348,7 @@ export default function Landing() {
 
       {/* FOOTER */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex items-center justify-center gap-2">
             {[FiGithub, FiGlobe, FiMail].map((Icon, i) => (
               <a key={i} href="#" className="w-7 h-7 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
@@ -356,15 +356,7 @@ export default function Landing() {
               </a>
             ))}
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-800 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-[11px] text-gray-400">&copy; 2026 QuizMaster. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</a>
-              <a href="#" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Terms</a>
-              <Link to="/login" className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Log in</Link>
-              <Link to="/register" className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors font-medium">Get started</Link>
-            </div>
-          </div>
+          <p className="text-[11px] text-gray-400 text-center mt-4">&copy; 2026 QuizMaster. All rights reserved.</p>
         </div>
       </footer>
     </div>
