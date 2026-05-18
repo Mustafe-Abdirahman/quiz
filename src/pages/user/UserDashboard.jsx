@@ -16,12 +16,16 @@ export default function UserDashboard() {
   useEffect(() => {
     if (!user?.userId) return;
     async function load() {
-      const [attemptsData, statsData] = await Promise.all([
-        quizService.getUserAttempts(user.userId),
-        quizService.getUserStats(user.userId),
-      ]);
-      setAttempts(attemptsData);
-      setStats(statsData);
+      try {
+        const [attemptsData, statsData] = await Promise.all([
+          quizService.getUserAttempts(user.userId),
+          quizService.getUserStats(user.userId),
+        ]);
+        setAttempts(attemptsData);
+        setStats(statsData);
+      } catch {
+        setStats(null);
+      }
     }
     load();
   }, [user]);
