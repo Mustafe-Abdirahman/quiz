@@ -1,5 +1,5 @@
-INSERT IGNORE INTO users (id, username, email, password, fullName, role, createdAt) VALUES
-('admin1', 'Admin', 'admin@quiz.com', '$2a$10$dummy', 'Administrator', 'admin', NOW());
+INSERT IGNORE INTO users (id, username, email, password, fullName, role, avatar, createdAt) VALUES
+('admin1', 'Admin', 'admin@quiz.com', '$2a$10$dummy', 'Administrator', 'admin', NULL, NOW());
 
 INSERT IGNORE INTO categories (id, name, icon) VALUES
 ('cat1', 'Science', '🔬'),

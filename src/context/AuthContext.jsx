@@ -37,9 +37,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const refreshUser = useCallback(() => {
-    const session = authService.getSession();
-    setUser(session);
+  const refreshUser = useCallback(async () => {
+    const refreshed = await authService.refreshSession();
+    if (refreshed.success) {
+      setUser(refreshed.user);
+    } else {
+      const session = authService.getSession();
+      setUser(session);
+    }
   }, []);
 
   return (

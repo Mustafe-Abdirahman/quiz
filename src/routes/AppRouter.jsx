@@ -20,6 +20,8 @@ import QuizPlayer from '../pages/user/QuizPlayer';
 import Leaderboard from '../pages/user/Leaderboard';
 import CompetitionRooms from '../pages/user/CompetitionRooms';
 
+import ProfilePage from '../pages/settings/ProfilePage';
+
 import MultiplayerRoom from '../pages/multiplayer/MultiplayerRoom';
 
 export default function AppRouter() {
@@ -37,6 +39,7 @@ export default function AppRouter() {
         <Route path="/admin/competition" element={<ProtectedRoute role="admin"><CompetitionMonitor /></ProtectedRoute>} />
         <Route path="/admin/rooms" element={<ProtectedRoute role="admin"><AdminRoomManagement /></ProtectedRoute>} />
         <Route path="/admin/room/:id" element={<ProtectedRoute role="admin"><AdminLayout><MultiplayerRoom /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute role="admin"><AdminLayout><ProfilePage /></AdminLayout></ProtectedRoute>} />
 
         <Route path="/user/dashboard" element={<ProtectedRoute role="user"><UserDashboard /></ProtectedRoute>} />
         <Route path="/user/quizzes" element={<ProtectedRoute role="user"><QuizList /></ProtectedRoute>} />
@@ -44,6 +47,7 @@ export default function AppRouter() {
         <Route path="/user/leaderboard" element={<ProtectedRoute role="user"><Leaderboard /></ProtectedRoute>} />
         <Route path="/user/rooms" element={<ProtectedRoute role="user"><UserLayout><CompetitionRooms /></UserLayout></ProtectedRoute>} />
         <Route path="/user/room/:id" element={<ProtectedRoute role="user"><UserLayout><MultiplayerRoom /></UserLayout></ProtectedRoute>} />
+        <Route path="/user/settings" element={<ProtectedRoute role="user"><UserLayout><ProfilePage /></UserLayout></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

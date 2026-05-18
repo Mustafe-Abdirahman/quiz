@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiGrid, FiBookOpen, FiAward, FiUsers, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiGrid, FiBookOpen, FiAward, FiUsers, FiSettings, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import Navbar from '../components/common/Navbar';
 
 const sidebarLinks = [
@@ -8,6 +8,7 @@ const sidebarLinks = [
   { to: '/user/quizzes', icon: FiBookOpen, label: 'Quizzes' },
   { to: '/user/leaderboard', icon: FiAward, label: 'Leaderboard' },
   { to: '/user/rooms', icon: FiUsers, label: 'Competition' },
+  { to: '/user/settings', icon: FiSettings, label: 'Settings' },
 ];
 
 export default function UserLayout({ children }) {

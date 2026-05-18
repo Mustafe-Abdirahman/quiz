@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL,
   fullName VARCHAR(255) DEFAULT NULL,
   role ENUM('admin', 'user') DEFAULT 'user',
+  avatar LONGTEXT DEFAULT NULL,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

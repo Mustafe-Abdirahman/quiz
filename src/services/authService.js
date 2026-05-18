@@ -69,6 +69,14 @@ export const authService = {
     return api.put(`/users/${id}`, updates);
   },
 
+  async updateProfile(data) {
+    const result = await api.put('/auth/profile', data);
+    if (result.success) {
+      localStorage.setItem('quiz_session', JSON.stringify(result.user));
+    }
+    return result;
+  },
+
   async deleteUser(id) {
     return api.delete(`/users/${id}`);
   },
