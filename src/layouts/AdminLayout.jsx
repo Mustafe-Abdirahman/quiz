@@ -9,7 +9,7 @@ const sidebarLinks = [
   { to: '/admin/quizzes', icon: FiBookOpen, label: 'Quizzes' },
   { to: '/admin/questions', icon: FiFileText, label: 'Questions' },
   { to: '/admin/competition', icon: FiBarChart2, label: 'Monitor' },
-  { to: '/admin/rooms', icon: FiMonitor, label: 'Competition Rooms' },
+  { to: '/admin/rooms', icon: FiMonitor, label: 'Rooms' },
 ];
 
 export default function AdminLayout({ children }) {
