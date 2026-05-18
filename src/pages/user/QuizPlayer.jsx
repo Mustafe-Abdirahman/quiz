@@ -256,12 +256,12 @@ export default function QuizPlayer() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-4 animate-fadeIn">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
               {(() => {
-                const parts = question.text.split('___');
+                const parts = question.text.split(/_{3,}/);
                 return parts.map((part, i) =>
                   i === 0 ? part : (
                     <span key={i}>
                       <span className="px-3 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded border-2 border-dashed border-indigo-300 dark:border-indigo-600 font-semibold">
-                        {answered && selectedAnswer !== null && selectedAnswer !== -1 ? question.options[selectedAnswer] : '______'}
+                        {answered ? question.options[selectedAnswer] : '______'}
                       </span>
                       {part}
                     </span>
