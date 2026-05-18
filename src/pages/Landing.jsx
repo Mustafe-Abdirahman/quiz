@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiCheckCircle, FiStar, FiClock, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiSun, FiMoon, FiPlay, FiChevronRight, FiLayers, FiTarget, FiDollarSign } from 'react-icons/fi';
+import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiCheckCircle, FiStar, FiClock, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiSun, FiMoon, FiPlay, FiChevronRight, FiLayers, FiTarget } from 'react-icons/fi';
 import Button from '../components/ui/Button';
 import { useTheme } from '../context/ThemeContext';
 
