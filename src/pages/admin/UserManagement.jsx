@@ -216,30 +216,8 @@ export default function UserManagement() {
                 {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
               </button>
             </div>
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                  registerForm.role === 'user'
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
-                }`}>
-                  <input type="radio" name="registerRole" value="user" checked={registerForm.role === 'user'}
-                    onChange={e => setRegisterForm({ ...registerForm, role: e.target.value })} className="sr-only" />
-                  <span className="text-sm font-medium">User</span>
-                </label>
-                <label className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                  registerForm.role === 'admin'
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
-                }`}>
-                  <input type="radio" name="registerRole" value="admin" checked={registerForm.role === 'admin'}
-                    onChange={e => setRegisterForm({ ...registerForm, role: e.target.value })} className="sr-only" />
-                  <FiShield size={16} />
-                  <span className="text-sm font-medium">Admin</span>
-                </label>
-              </div>
-            </div>
+            <Select label="Role" value={registerForm.role} onChange={e => setRegisterForm({ ...registerForm, role: e.target.value })}
+              options={[{ value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }]} />
             <Button onClick={handleRegisterSubmit} className="w-full" disabled={registerLoading}>
               {registerLoading ? 'Registering...' : 'Register User'}
             </Button>
