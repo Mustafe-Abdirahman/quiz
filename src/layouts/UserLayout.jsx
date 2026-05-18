@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiGrid, FiBookOpen, FiAward, FiUsers, FiMenu, FiX } from 'react-icons/fi';
+import { FiGrid, FiBookOpen, FiAward, FiUsers } from 'react-icons/fi';
 import Navbar from '../components/common/Navbar';
 
 const sidebarLinks = [
@@ -11,43 +10,17 @@ const sidebarLinks = [
 ];
 
 export default function UserLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const closeSidebar = () => setSidebarOpen(false);
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       <div className="flex">
-        {/* Mobile overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
-            onClick={closeSidebar}
-          />
-        )}
-
-        {/* Hamburger toggle - mobile only */}
-        <button
-          onClick={() => setSidebarOpen(prev => !prev)}
-          className="fixed top-20 left-4 z-50 lg:hidden p-2.5 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-        >
-          {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-        </button>
-
-        {/* Sidebar */}
-        <aside
-          className={`fixed left-0 top-16 bottom-0 z-40 flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}
-        >
+        <aside className="hidden lg:flex flex-col w-64 fixed left-0 top-16 bottom-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
           <nav className="space-y-1">
             {sidebarLinks.map(link => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 end={link.to === '/user/dashboard'}
-                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
