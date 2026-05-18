@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiClock, FiCheckCircle, FiStar, FiLayers, FiPlay, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiHeart, FiChevronRight } from 'react-icons/fi';
+import { FiArrowRight, FiUsers, FiAward, FiZap, FiBarChart2, FiClock, FiCheckCircle, FiStar, FiLayers, FiPlay, FiTrendingUp, FiGlobe, FiMail, FiGithub, FiShield, FiBookOpen, FiRefreshCw, FiHeart, FiChevronRight, FiSun, FiMoon } from 'react-icons/fi';
 import Button from '../components/ui/Button';
+import { useTheme } from '../context/ThemeContext';
 
 const features = [
   { icon: FiZap, title: 'Solo Mode', desc: 'Test your knowledge with timed quizzes across multiple categories with instant feedback and detailed explanations.', gradient: 'from-amber-500 to-orange-600' },
@@ -34,6 +35,7 @@ const testimonials = [
 ];
 
 export default function Landing() {
+  const { dark, toggleTheme } = useTheme();
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 overflow-x-hidden">
 
@@ -55,7 +57,11 @@ export default function Landing() {
                 </a>
               ))}
             </nav>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button onClick={toggleTheme} className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200" title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
+                {dark ? <FiSun size={16} /> : <FiMoon size={16} />}
+              </button>
+              <div className="h-5 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
               <Link to="/login" className="hidden sm:inline-flex text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Log in</Link>
               <Button to="/register" size="sm" className="!rounded-full shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all duration-300">
                 Get Started
