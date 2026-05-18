@@ -96,9 +96,9 @@ export default function QuestionManagement() {
       options = ['True', 'False'];
       correctAnswer = Number(form.correctAnswer);
     } else if (form.type === 'fill') {
-      if (!form.fillAnswer.trim()) { addToast('Correct answer is required', 'error'); return; }
-      options = [form.fillAnswer.trim()];
-      correctAnswer = 0;
+      options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
+      if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
+      correctAnswer = Number(form.correctAnswer);
     } else {
       options = [form.option1, form.option2, form.option3, form.option4].filter(o => o.trim());
       if (options.length < 2) { addToast('At least 2 options required', 'error'); return; }
@@ -162,8 +162,6 @@ export default function QuestionManagement() {
     let options;
     if (type === 'truefalse') {
       options = ['True', 'False'];
-    } else if (type === 'fill') {
-      options = [oa || ob || oc || od || ''];
     } else {
       options = [oa, ob, oc, od].filter(o => o.toString().trim());
     }
@@ -229,19 +227,16 @@ export default function QuestionManagement() {
       return;
     }
 
-    const data = quizQuestions.map(q => {
-      const isFill = q.type === 'fill';
-      return {
+    const data = quizQuestions.map(q => ({
         Question: q.text,
         'Option A': q.options[0] || '',
-        'Option B': isFill ? '' : (q.options[1] || ''),
-        'Option C': isFill ? '' : (q.options[2] || ''),
-        'Option D': isFill ? '' : (q.options[3] || ''),
+        'Option B': q.options[1] || '',
+        'Option C': q.options[2] || '',
+        'Option D': q.options[3] || '',
         'Correct Answer': q.type === 'truefalse' ? (q.correctAnswer === 0 ? 'True' : 'False') : q.correctAnswer,
         Difficulty: q.difficulty,
         Type: q.type || 'multiple',
-      };
-    });
+      }));
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -353,9 +348,7 @@ export default function QuestionManagement() {
                         </div>
                       ) : (
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                          {filtered.map(q => {
-                            const isFill = q.type === 'fill';
-                            return (
+                          {filtered.map(q => (
                               <div key={q.id} className="p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="flex-1 min-w-0">
@@ -363,18 +356,13 @@ export default function QuestionManagement() {
                                       <p className="text-sm font-medium text-gray-900 dark:text-white">{q.text}</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
-                                      {isFill ? (
-                                        <span className="px-2 py-1 text-xs rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                          Answer: {q.options[0]}
-                                        </span>
-                                      ) : (
-                                        q.options.map((opt, i) => (
+                                      {q.options.map((opt, i) => (
                                           <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
                                             {opt}
                                           </span>
                                         ))
-                                      )}
-                                    </div>
+                                        }
+                                      </div>
                                     <div className="flex items-center gap-2 mt-2">
                                       <Badge variant={(typeBadgeColors[q.type] || 'blue')}>{q.type || 'multiple'}</Badge>
                                       <Badge variant={q.difficulty}>{q.difficulty}</Badge>
@@ -391,8 +379,7 @@ export default function QuestionManagement() {
                                   </div>
                                 </div>
                               </div>
-                            );
-                          })}
+                            ))}
                         </div>
                       )}
                     </div>
@@ -414,7 +401,7 @@ export default function QuestionManagement() {
               <Select label="Difficulty" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })} options={diffOptions} />
             </div>
 
-            {form.type === 'multiple' && (
+            {form.type !== 'truefalse' && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="Option 1" value={form.option1} onChange={e => setForm({ ...form, option1: e.target.value })} placeholder="Option A" />
@@ -430,10 +417,6 @@ export default function QuestionManagement() {
             {form.type === 'truefalse' && (
               <Select label="Correct Answer" value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })}
                 options={correctOptions} />
-            )}
-
-            {form.type === 'fill' && (
-              <Input label="Correct Answer" value={form.fillAnswer} onChange={e => setForm({ ...form, fillAnswer: e.target.value })} placeholder="Enter the correct answer" />
             )}
 
             <Button onClick={handleSubmit} className="w-full">{modal.mode === 'create' ? 'Add Question' : 'Save Changes'}</Button>

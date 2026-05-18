@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiCheck, FiX, FiAlertCircle, FiArrowLeft, FiSend } from 'react-icons/fi';
+import { FiCheck, FiX, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
 import Timer from '../../components/common/Timer';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 import { quizService } from '../../services/quizService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
@@ -20,7 +19,6 @@ export default function QuizPlayer() {
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [fillInput, setFillInput] = useState('');
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -79,32 +77,6 @@ export default function QuizPlayer() {
     }]);
   }, [answered, questions, currentQ]);
 
-  const handleFillSubmit = useCallback(() => {
-    if (answered) return;
-    const q = questions[currentQ];
-    const correctAnswer = (q.options[0] || '').trim().toLowerCase();
-    const userAnswer = fillInput.trim().toLowerCase();
-    const isCorrect = userAnswer === correctAnswer;
-
-    setSelectedAnswer(fillInput);
-    setAnswered(true);
-    setIsRunning(false);
-
-    if (isCorrect) {
-      setScore(s => s + 10);
-      setCorrect(c => c + 1);
-    } else {
-      setIncorrect(c => c + 1);
-    }
-
-    setResults(prev => [...prev, {
-      question: q.text,
-      selected: fillInput,
-      correct: q.options[0],
-      isCorrect,
-    }]);
-  }, [answered, questions, currentQ, fillInput]);
-
   const handleTimeUp = useCallback(() => {
     if (answered) return;
     setAnswered(true);
@@ -114,7 +86,7 @@ export default function QuizPlayer() {
     setResults(prev => [...prev, {
       question: q.text,
       selected: -1,
-      correct: q.type === 'fill' ? q.options[0] : q.correctAnswer,
+      correct: q.correctAnswer,
       isCorrect: false,
     }]);
   }, [answered, questions, currentQ]);
@@ -123,7 +95,6 @@ export default function QuizPlayer() {
     if (currentQ + 1 < questions.length) {
       setCurrentQ(c => c + 1);
       setSelectedAnswer(null);
-      setFillInput('');
       setAnswered(false);
       setIsRunning(true);
       setTimerKey(k => k + 1);
@@ -249,7 +220,6 @@ export default function QuizPlayer() {
 
   const question = questions[currentQ];
   if (!question) return null;
-  const isFill = question.type === 'fill';
   const isTrueFalse = question.type === 'truefalse';
 
   return (
@@ -283,40 +253,23 @@ export default function QuizPlayer() {
           isRunning={isRunning}
         />
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-4 animate-fadeIn">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-            {question.text}
-          </h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-4 animate-fadeIn">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
+              {(() => {
+                const parts = question.text.split('___');
+                return parts.map((part, i) =>
+                  i === 0 ? part : (
+                    <span key={i}>
+                      <span className="px-3 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded border-2 border-dashed border-indigo-300 dark:border-indigo-600 font-semibold">
+                        {answered && selectedAnswer !== null && selectedAnswer !== -1 ? question.options[selectedAnswer] : '______'}
+                      </span>
+                      {part}
+                    </span>
+                  )
+                );
+              })()}
+            </h2>
 
-          {isFill ? (
-            <div className="space-y-4">
-              <Input
-                placeholder="Type your answer..."
-                value={fillInput}
-                onChange={e => setFillInput(e.target.value)}
-                disabled={answered}
-                onKeyDown={e => { if (e.key === 'Enter' && !answered && fillInput.trim()) handleFillSubmit(); }}
-              />
-              {!answered && (
-                <Button onClick={handleFillSubmit} disabled={!fillInput.trim()} className="w-full">
-                  <FiSend size={16} /> Submit Answer
-                </Button>
-              )}
-              {answered && (
-                <div className="mt-4 animate-fadeIn">
-                  {selectedAnswer === question.options[0] || (typeof selectedAnswer === 'string' && selectedAnswer.trim().toLowerCase() === (question.options[0] || '').trim().toLowerCase()) ? (
-                    <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
-                      <FiCheck size={16} /> Correct!
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-400 font-medium flex items-center gap-2">
-                      <FiX size={16} /> Incorrect! The correct answer was: {question.options[0]}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
             <div className="space-y-3">
               {question.options.map((opt, idx) => {
                 let btnClass = 'border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20';
@@ -348,30 +301,28 @@ export default function QuizPlayer() {
                 );
               })}
             </div>
-          )}
 
-          {answered && !isFill && (
-            <div className="mt-6 animate-fadeIn">
-              {selectedAnswer === question.correctAnswer ? (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
-                  <FiCheck size={16} /> Correct!
-                </div>
-              ) : (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-400 font-medium flex items-center gap-2">
-                  <FiX size={16} /> Incorrect! The correct answer was: {question.options[question.correctAnswer]}
-                </div>
-              )}
-            </div>
-          )}
-
-          {answered && (
-            <button
-              onClick={nextQuestion}
-              className="mt-4 w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              {currentQ + 1 < questions.length ? 'Next Question' : 'See Results'}
-            </button>
-          )}
+            {answered && (
+              <div className="mt-6 animate-fadeIn">
+                {selectedAnswer === question.correctAnswer ? (
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
+                    <FiCheck size={16} /> Correct!
+                  </div>
+                ) : (
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-400 font-medium flex items-center gap-2">
+                    <FiX size={16} /> Incorrect! The correct answer was: {question.options[question.correctAnswer]}
+                  </div>
+                )}
+              </div>
+            )}
+            {answered && (
+              <button
+                onClick={nextQuestion}
+                className="mt-4 w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                {currentQ + 1 < questions.length ? 'Next Question' : 'See Results'}
+              </button>
+            )}
         </div>
       </div>
     </div>
