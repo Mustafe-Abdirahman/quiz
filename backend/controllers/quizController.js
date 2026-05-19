@@ -5,13 +5,18 @@ export async function getQuizzes(req, res) {
   try {
     let rows;
     if (req.user && req.user.role === 'user') {
-      const [r] = await pool.query(`
-        SELECT q.* FROM quizzes q
-        INNER JOIN quiz_assignments qa ON qa.quizId = q.id
-        WHERE qa.userId = ?
-        ORDER BY q.createdAt DESC
-      `, [req.user.userId]);
-      rows = r;
+      try {
+        const [r] = await pool.query(`
+          SELECT q.* FROM quizzes q
+          INNER JOIN quiz_assignments qa ON qa.quizId = q.id
+          WHERE qa.userId = ?
+          ORDER BY q.createdAt DESC
+        `, [req.user.userId]);
+        rows = r;
+      } catch {
+        const [r] = await pool.query('SELECT * FROM quizzes ORDER BY createdAt DESC');
+        rows = r;
+      }
     } else {
       const [r] = await pool.query('SELECT * FROM quizzes ORDER BY createdAt DESC');
       rows = r;

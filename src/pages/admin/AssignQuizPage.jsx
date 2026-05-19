@@ -24,12 +24,12 @@ export default function AssignQuizPage() {
   })), [quizzes]);
 
   useEffect(() => {
-    authService.getUsers().then(data => setUsers(data.filter(u => u.role === 'user'))).catch(() => {});
+    authService.getUsers().then(data => setUsers(data.filter(u => u.role === 'user'))).catch(() => setUsers([]));
   }, []);
 
   useEffect(() => {
     if (!selectedQuizId) { setAssignedIds(new Set()); return; }
-    quizService.getAssignedUserIds(selectedQuizId).then(ids => setAssignedIds(new Set(ids)));
+    quizService.getAssignedUserIds(selectedQuizId).then(ids => setAssignedIds(new Set(ids))).catch(() => setAssignedIds(new Set()));
   }, [selectedQuizId]);
 
   const toggleUser = (userId) => {
