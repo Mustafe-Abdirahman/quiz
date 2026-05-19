@@ -86,6 +86,23 @@ export default function MultiplayerRoom() {
     }
   };
 
+  const handleRestart = async () => {
+    const qIds = allQuestions.map(q => q.id);
+    const result = await roomService.startGame(room.code, qIds);
+    if (result.success) {
+      setFinished(false);
+      setWinner(null);
+      setCurrentQ(0);
+      setSelectedAnswer(null);
+      setAnswered(false);
+      setIsRunning(true);
+      setTimerKey(k => k + 1);
+      const updatedRoom = await roomService.getRoomById(room.id);
+      setRoom(updatedRoom);
+      setPlayers([...updatedRoom.players].sort((a, b) => b.score - a.score));
+    }
+  };
+
   const handleAnswer = useCallback(async (idx) => {
     if (answered || !room || !myQuestions[currentQ]) return;
     setSelectedAnswer(idx);
@@ -247,12 +264,22 @@ export default function MultiplayerRoom() {
               ))}
             </div>
 
-            <button
-              onClick={() => navigate(roomRoute(role, '/rooms'))}
-              className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              Back to Rooms
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate(roomRoute(role, '/rooms'))}
+                className="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Back to Rooms
+              </button>
+              {(room.hostId === user?.userId || role === 'admin') && (
+                <button
+                  onClick={handleRestart}
+                  className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Play Again
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
