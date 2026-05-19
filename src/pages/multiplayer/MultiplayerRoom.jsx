@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiCheck, FiX, FiUsers, FiClock, FiZap } from 'react-icons/fi';
 import Timer from '../../components/common/Timer';
@@ -27,6 +27,13 @@ export default function MultiplayerRoom() {
   const [finished, setFinished] = useState(false);
   const [winner, setWinner] = useState(null);
   const intervalRef = useRef(null);
+
+  const myQuestions = useMemo(() => {
+    if (!room || !allQuestions.length) return [];
+    const me = room.players.find(p => p.userId === user?.userId);
+    if (!me || !me.questionIds?.length) return [];
+    return me.questionIds.map(id => allQuestions.find(q => q.id === id)).filter(Boolean);
+  }, [room, allQuestions, user]);
 
   const refreshRoom = useCallback(async () => {
     const r = await roomService.getRoomById(id);
@@ -80,35 +87,33 @@ export default function MultiplayerRoom() {
   };
 
   const handleAnswer = useCallback(async (idx) => {
-    if (answered || !room || !allQuestions[currentQ]) return;
+    if (answered || !room || !myQuestions[currentQ]) return;
     setSelectedAnswer(idx);
     setAnswered(true);
     setIsRunning(false);
-    const isCorrect = idx === allQuestions[currentQ].correctAnswer;
+    const isCorrect = idx === myQuestions[currentQ].correctAnswer;
     await roomService.submitAnswer(room.id, user?.userId, currentQ, idx, isCorrect, 0);
     await refreshRoom();
-  }, [answered, room, allQuestions, currentQ, user, refreshRoom]);
+  }, [answered, room, myQuestions, currentQ, user, refreshRoom]);
 
   const handleTimeUp = useCallback(async () => {
-    if (answered || !room || !allQuestions[currentQ]) return;
+    if (answered || !room || !myQuestions[currentQ]) return;
     setAnswered(true);
     setIsRunning(false);
     await roomService.submitAnswer(room.id, user?.userId, currentQ, -1, false, 60);
     await refreshRoom();
-  }, [answered, room, allQuestions, currentQ, user, refreshRoom]);
+  }, [answered, room, myQuestions, currentQ, user, refreshRoom]);
 
   const nextQuestion = useCallback(async () => {
     const nextIdx = currentQ + 1;
-    const me = room?.players?.find(p => p.userId === user?.userId);
-    const myTotal = me?.questionIds?.length || allQuestions.length;
-    if (nextIdx < myTotal) {
+    if (nextIdx < myQuestions.length) {
       setCurrentQ(nextIdx);
       setSelectedAnswer(null);
       setAnswered(false);
       setIsRunning(true);
       setTimerKey(k => k + 1);
     }
-  }, [currentQ, allQuestions, room, user]);
+  }, [currentQ, myQuestions.length]);
 
   useEffect(() => {
     if (!room || !allQuestions.length) return;
@@ -118,7 +123,7 @@ export default function MultiplayerRoom() {
       setWinner(sorted[0]);
       clearInterval(intervalRef.current);
     }
-  }, [room, allQuestions, finished]);
+  }, [room, myQuestions, finished]);
 
   const currentPlayerIdx = room?.currentTurn ?? 0;
   const currentPlayer = room?.players?.[currentPlayerIdx];
@@ -271,7 +276,7 @@ export default function MultiplayerRoom() {
                 </p>
                 {myPlayer && (
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl text-sm text-indigo-700 dark:text-indigo-300 font-medium">
-                    <FiZap size={14} /> Score: {myPlayer.score} &middot; {myPlayer.correct}/{myPlayer.correct + myPlayer.incorrect} correct
+                    <FiZap size={14} /> Score: {myPlayer.score} &middot; {myPlayer.correct}/{myPlayer.correct + myPlayer.incorrect} correct &middot; {myQuestions.length} questions
                   </div>
                 )}
               </>
@@ -302,9 +307,8 @@ export default function MultiplayerRoom() {
     );
   }
 
-  const question = allQuestions[currentQ];
-  const me = room.players.find(p => p.userId === user?.userId);
-  const myTotal = me?.questionIds?.length || allQuestions.length || 1;
+  const question = myQuestions[currentQ];
+  const myTotal = myQuestions.length || 1;
 
   if (!question) {
     return (
