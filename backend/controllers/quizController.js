@@ -6,6 +6,7 @@ export async function getQuizzes(req, res) {
     let rows;
     if (req.user && req.user.role === 'user') {
       try {
+        await ensureAssignmentsTable();
         const [r] = await pool.query(`
           SELECT q.* FROM quizzes q
           INNER JOIN quiz_assignments qa ON qa.quizId = q.id
@@ -94,6 +95,7 @@ export async function assignQuiz(req, res) {
     if (!Array.isArray(userIds)) {
       return res.status(400).json({ success: false, message: 'userIds must be an array' });
     }
+    await ensureAssignmentsTable();
     await pool.query('DELETE FROM quiz_assignments WHERE quizId = ?', [req.params.id]);
     if (userIds.length > 0) {
       const values = userIds.map(uid => [req.params.id, uid]);
@@ -107,9 +109,22 @@ export async function assignQuiz(req, res) {
 
 export async function getAssignments(req, res) {
   try {
+    await ensureAssignmentsTable();
     const [rows] = await pool.query('SELECT userId FROM quiz_assignments WHERE quizId = ?', [req.params.id]);
     res.json({ success: true, userIds: rows.map(r => r.userId) });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch assignments' });
   }
+}
+
+async function ensureAssignmentsTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS quiz_assignments (
+      quizId VARCHAR(36) NOT NULL,
+      userId VARCHAR(36) NOT NULL,
+      PRIMARY KEY (quizId, userId),
+      FOREIGN KEY (quizId) REFERENCES quizzes(id) ON DELETE CASCADE,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
 }
