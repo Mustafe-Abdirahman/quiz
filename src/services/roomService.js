@@ -27,21 +27,11 @@ export const roomService = {
   async startGame(code, allQuestionIds = []) {
     const room = await this.getRoomByCode(code);
     if (!room) return { success: false, message: 'Room not found' };
-    return api.post(`/rooms/${room.id}/start`);
+    return api.post(`/rooms/${room.id}/start`, { allQuestionIds });
   },
 
-  async nextPlayerQuestion(code, userId) {
-    return { success: true };
-  },
-
-  async submitAnswer(code, userId, questionIndex, answer, isCorrect, timeTaken) {
-    const room = await this.getRoomByCode(code);
-    if (!room) return { success: false };
-    return { success: true, room };
-  },
-
-  async nextQuestion(code) {
-    return { success: true };
+  async submitAnswer(roomId, userId, questionIndex, answer, isCorrect, timeTaken) {
+    return api.post(`/rooms/${roomId}/submit-answer`, { questionIndex, answerIndex: answer, isCorrect, timeTaken });
   },
 
   async finishPlayer(code, userId) {

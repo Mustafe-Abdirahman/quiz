@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS rooms (
   hostId VARCHAR(36),
   maxPlayers INT DEFAULT 4,
   players JSON,
+  currentTurn INT DEFAULT 0,
   status ENUM('waiting', 'playing', 'finished') DEFAULT 'waiting',
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (quizId) REFERENCES quizzes(id) ON DELETE SET NULL,

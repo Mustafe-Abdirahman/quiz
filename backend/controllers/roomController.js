@@ -107,6 +107,7 @@ export async function startGame(req, res) {
 
     const room = rows[0];
     const players = room.players;
+    const allQuestionIds = req.body.allQuestionIds || [];
 
     if (players.length === 0) return res.status(400).json({ success: false, message: 'No players in room' });
 
@@ -117,13 +118,69 @@ export async function startGame(req, res) {
       p.correct = 0;
       p.incorrect = 0;
       p.answers = [];
+      p.questionIds = allQuestionIds;
     });
 
-    await pool.query('UPDATE rooms SET status = \'playing\', players = ? WHERE id = ?', [JSON.stringify(players), req.params.id]);
+    await pool.query(
+      'UPDATE rooms SET status = \'playing\', players = ?, currentTurn = 0 WHERE id = ?',
+      [JSON.stringify(players), req.params.id]
+    );
     const [updated] = await pool.query('SELECT * FROM rooms WHERE id = ?', [req.params.id]);
     const result = { ...updated[0], players: updated[0].players };
     res.json({ success: true, room: result });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to start game' });
+  }
+}
+
+export async function submitAnswer(req, res) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM rooms WHERE id = ?', [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Room not found' });
+
+    const room = rows[0];
+    if (room.status !== 'playing') return res.status(400).json({ success: false, message: 'Game not playing' });
+
+    const players = room.players;
+    const turnIdx = room.currentTurn || 0;
+    const player = players[turnIdx];
+
+    if (!player) return res.status(400).json({ success: false, message: 'Invalid turn' });
+    if (player.userId !== req.user.userId) return res.status(403).json({ success: false, message: 'Not your turn' });
+
+    const { questionIndex, answerIndex, isCorrect, timeTaken } = req.body;
+
+    player.answers.push({ q: questionIndex, answer: answerIndex, correct: isCorrect, time: timeTaken || 0 });
+    if (isCorrect) { player.correct++; player.score += 10; }
+    else { player.incorrect++; }
+    player.currentQuestion = (questionIndex || 0) + 1;
+
+    let nextTurn = turnIdx;
+    if (player.currentQuestion >= (player.questionIds?.length || 0)) {
+      player.finished = true;
+      let found = false;
+      for (let i = 1; i < players.length; i++) {
+        const idx = (turnIdx + i) % players.length;
+        if (!players[idx].finished) { nextTurn = idx; found = true; break; }
+      }
+      if (!found) {
+        await pool.query(
+          'UPDATE rooms SET players = ?, status = \'finished\', currentTurn = 0 WHERE id = ?',
+          [JSON.stringify(players), req.params.id]
+        );
+        const [updated] = await pool.query('SELECT * FROM rooms WHERE id = ?', [req.params.id]);
+        return res.json({ success: true, room: { ...updated[0], players: updated[0].players } });
+      }
+    }
+
+    await pool.query(
+      'UPDATE rooms SET players = ?, currentTurn = ? WHERE id = ?',
+      [JSON.stringify(players), nextTurn, req.params.id]
+    );
+    const [updated] = await pool.query('SELECT * FROM rooms WHERE id = ?', [req.params.id]);
+    const result = { ...updated[0], players: updated[0].players };
+    res.json({ success: true, room: result });
+  } catch {
+    res.status(500).json({ success: false, message: 'Failed to submit answer' });
   }
 }
