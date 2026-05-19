@@ -1,4 +1,4 @@
-import { FiPlay, FiAlertCircle } from 'react-icons/fi';
+import { FiPlay, FiAlertCircle, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 
@@ -8,7 +8,7 @@ const difficultyConfig = {
   hard: { gradient: 'from-rose-500 to-rose-600', badge: 'danger', label: 'Hard' },
 };
 
-export default function QuizCard({ quiz, onPlay, questionCount, admin }) {
+export default function QuizCard({ quiz, onPlay, questionCount, admin, onEdit, onDelete }) {
   const qCount = questionCount ?? quiz?.totalQuestions ?? quiz?.questions?.length ?? 0;
   const hasQuestions = qCount > 0;
   const cfg = difficultyConfig[quiz.difficulty] || difficultyConfig.medium;
@@ -42,15 +42,32 @@ export default function QuizCard({ quiz, onPlay, questionCount, admin }) {
           <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-2 line-clamp-1 leading-relaxed">{quiz.description}</p>
         )}
 
-        <div className="flex items-center gap-2.5 mb-2.5 text-[10px] text-gray-400 dark:text-gray-500">
+        <div className="flex items-center gap-2 mb-2 text-[10px] text-gray-400 dark:text-gray-500">
           <span className="font-medium text-gray-600 dark:text-gray-300">{qCount} Q</span>
           <span>&middot;</span>
           <span>{quiz.timePerQuestion}s</span>
-          <span>&middot;</span>
-          <span>{quiz.playCount || 0} plays</span>
+          <span className="ml-auto flex items-center gap-1.5">
+            {admin && (
+              <span className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity mr-1">
+                <button onClick={(e) => { e.stopPropagation(); onEdit?.(quiz); }}
+                  className="p-0.5 rounded text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  title="Edit quiz"
+                >
+                  <FiEdit2 size={11} />
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); onDelete?.(quiz); }}
+                  className="p-0.5 rounded text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  title="Delete quiz"
+                >
+                  <FiTrash2 size={11} />
+                </button>
+              </span>
+            )}
+            <span>{quiz.playCount || 0} plays</span>
+          </span>
         </div>
 
-        {admin ? null : onPlay ? (
+        {!admin && onPlay ? (
           hasQuestions ? (
             <Button onClick={() => onPlay(quiz.id)} size="xs" className="w-full text-[10px] py-1">
               <FiPlay size={10} />
