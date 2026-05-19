@@ -111,14 +111,14 @@ export async function startGame(req, res) {
 
     if (players.length === 0) return res.status(400).json({ success: false, message: 'No players in room' });
 
-    players.forEach(p => {
+    players.forEach((p, idx) => {
       p.currentQuestion = 0;
       p.finished = false;
       p.score = 0;
       p.correct = 0;
       p.incorrect = 0;
       p.answers = [];
-      p.questionIds = allQuestionIds;
+      p.questionIds = allQuestionIds.filter((_, qi) => qi % players.length === idx);
     });
 
     await pool.query(
