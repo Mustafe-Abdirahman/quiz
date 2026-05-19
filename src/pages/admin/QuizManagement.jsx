@@ -95,21 +95,17 @@ export default function QuizManagement() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <FiBookOpen size={24} />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold">Quiz Management</h1>
-                <p className="text-indigo-100 text-sm mt-0.5">{quizzes.length} quizzes &bull; {questions.length} questions</p>
-              </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <FiBookOpen size={20} />
             </div>
-            <Button onClick={openCreate} className="bg-white text-indigo-600 hover:bg-indigo-50 border-0 shrink-0 shadow-lg">
-              <FiPlus size={16} /> Create
-            </Button>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Quiz Management</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{quizzes.length} quizzes &bull; {questions.length} questions</p>
+            </div>
           </div>
+          <Button onClick={openCreate}><FiPlus size={16} /> Create</Button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -143,7 +139,7 @@ export default function QuizManagement() {
             />
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
             {filtered.map(q => (
               <div key={q.id} className="relative group/card">
                 <QuizCard quiz={q} questionCount={getQuestionCount(q)} admin />

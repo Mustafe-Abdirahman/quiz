@@ -48,6 +48,7 @@ export default function QuestionManagement() {
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState({});
   const [modal, setModal] = useState({ open: false, mode: 'create', question: null, quizId: '' });
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [form, setForm] = useState({ text: '', option1: '', option2: '', option3: '', option4: '', correctAnswer: '0', fillAnswer: '', type: 'multiple', difficulty: 'medium' });
 
   const questionsByQuiz = useMemo(() => {
@@ -128,10 +129,14 @@ export default function QuestionManagement() {
   };
 
   const handleDelete = async (q) => {
-    if (window.confirm('Delete this question?')) {
-      await removeQuestion(q.id);
-      addToast('Question deleted', 'success');
-    }
+    setConfirmDelete(q);
+  };
+
+  const confirmDeleteQuestion = async () => {
+    if (!confirmDelete) return;
+    await removeQuestion(confirmDelete.id);
+    addToast('Question deleted', 'success');
+    setConfirmDelete(null);
   };
 
   const parseImportedRow = (row, quizId) => {
@@ -423,6 +428,14 @@ export default function QuestionManagement() {
             <Button onClick={handleSubmit} className="w-full">{modal.mode === 'create' ? 'Add Question' : 'Save Changes'}</Button>
           </div>
         </Modal>
+
+        <ConfirmDialog
+          isOpen={!!confirmDelete}
+          onClose={() => setConfirmDelete(null)}
+          onConfirm={confirmDeleteQuestion}
+          title="Delete Question"
+          message="Are you sure you want to delete this question? This action cannot be undone."
+        />
       </div>
     </AdminLayout>
   );

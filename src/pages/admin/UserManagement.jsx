@@ -8,6 +8,7 @@ import Modal from '../../components/ui/Modal';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/ui/Toast';
 import { authService } from '../../services/authService';
@@ -22,6 +23,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [editModal, setEditModal] = useState({ open: false, user: null });
   const [editForm, setEditForm] = useState({ username: '', email: '', role: 'user' });
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [registerModal, setRegisterModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [registerForm, setRegisterForm] = useState({
@@ -65,11 +67,15 @@ export default function UserManagement() {
   };
 
   const handleDelete = async (id, username) => {
-    if (window.confirm(`Delete user "${username}"?`)) {
-      await authService.deleteUser(id);
-      addToast('User deleted', 'success');
-      await refresh();
-    }
+    setConfirmDelete({ id, username });
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!confirmDelete) return;
+    await authService.deleteUser(confirmDelete.id);
+    addToast('User deleted', 'success');
+    setConfirmDelete(null);
+    await refresh();
   };
 
   const openRegister = () => {
@@ -223,6 +229,14 @@ export default function UserManagement() {
             </Button>
           </div>
         </Modal>
+
+        <ConfirmDialog
+          isOpen={!!confirmDelete}
+          onClose={() => setConfirmDelete(null)}
+          onConfirm={confirmDeleteUser}
+          title="Delete User"
+          message={confirmDelete ? `Are you sure you want to delete user "${confirmDelete.username}"? This action cannot be undone.` : ''}
+        />
       </div>
     </AdminLayout>
   );
