@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiLogIn, FiUsers, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiLogIn, FiUsers, FiEdit2, FiTrash2, FiPlay } from 'react-icons/fi';
 import AdminLayout from '../../layouts/AdminLayout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -64,7 +64,7 @@ export default function AdminRoomManagement() {
       addToast(`Room created! Code: ${result.room.code}`, 'success');
       setCreateModal(false);
       setSelectedQuiz('');
-      await refresh();
+      navigate(`/admin/room/${result.room.id}`);
     }
   };
 
@@ -151,6 +151,9 @@ export default function AdminRoomManagement() {
                     ))}
                   </div>
                   <div className="flex gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => navigate(`/admin/room/${room.id}`)} className="flex-1">
+                      <FiPlay size={14} /> Play
+                    </Button>
                     <Button size="sm" variant="secondary" onClick={() => openEdit(room)} className="flex-1">
                       <FiEdit2 size={14} /> Edit
                     </Button>

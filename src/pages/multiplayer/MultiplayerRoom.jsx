@@ -179,10 +179,9 @@ export default function MultiplayerRoom() {
             {room.hostId === user?.userId && (
               <button
                 onClick={handleStartGame}
-                disabled={room.players.length < 2}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors"
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
               >
-                {room.players.length < 2 ? 'Need at least 2 players' : 'Start Game'}
+                Start Game
               </button>
             )}
             {room.hostId !== user?.userId && (
