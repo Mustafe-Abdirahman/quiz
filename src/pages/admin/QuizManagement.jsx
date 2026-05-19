@@ -7,6 +7,7 @@ import Select from '../../components/ui/Select';
 import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { useQuiz } from '../../context/QuizContext';
 import { useToast } from '../../components/ui/Toast';
 import { useAuth } from '../../context/AuthContext';
@@ -23,6 +24,7 @@ export default function QuizManagement() {
   const { addToast } = useToast();
   const { user } = useAuth();
   const [modal, setModal] = useState({ open: false, mode: 'create', quiz: null });
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -59,10 +61,14 @@ export default function QuizManagement() {
   };
 
   const handleDelete = async (quiz) => {
-    if (window.confirm(`Delete quiz "${quiz.title}"? This will also remove all associated questions.`)) {
-      await removeQuiz(quiz.id);
-      addToast('Quiz deleted', 'success');
-    }
+    setConfirmDelete(quiz);
+  };
+
+  const confirmDeleteQuiz = async () => {
+    if (!confirmDelete) return;
+    await removeQuiz(confirmDelete.id);
+    addToast('Quiz deleted', 'success');
+    setConfirmDelete(null);
   };
 
   const getQuestionCount = (quiz) => questions.filter(q => q.quizId === quiz.id).length;
@@ -214,6 +220,14 @@ export default function QuizManagement() {
             </Button>
           </div>
         </Modal>
+
+        <ConfirmDialog
+          isOpen={!!confirmDelete}
+          onClose={() => setConfirmDelete(null)}
+          onConfirm={confirmDeleteQuiz}
+          title="Delete Quiz"
+          message={confirmDelete ? `Are you sure you want to delete "${confirmDelete.title}"? This will also remove all associated questions.` : ''}
+        />
       </div>
     </AdminLayout>
   );

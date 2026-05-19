@@ -9,6 +9,7 @@ import Modal from '../../components/ui/Modal';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { useToast } from '../../components/ui/Toast';
 import { useQuiz } from '../../context/QuizContext';
 import { roomService } from '../../services/roomService';
@@ -24,6 +25,7 @@ export default function AdminRoomManagement() {
   const [joinModal, setJoinModal] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState('');
   const [roomCode, setRoomCode] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -82,11 +84,15 @@ export default function AdminRoomManagement() {
   };
 
   const handleDelete = async (room) => {
-    if (window.confirm(`Delete room "${room.code}"? This action cannot be undone.`)) {
-      await roomService.deleteRoomById(room.id);
-      addToast('Room deleted', 'success');
-      await refresh();
-    }
+    setConfirmDelete(room);
+  };
+
+  const confirmDeleteRoom = async () => {
+    if (!confirmDelete) return;
+    await roomService.deleteRoomById(confirmDelete.id);
+    addToast('Room deleted', 'success');
+    setConfirmDelete(null);
+    await refresh();
   };
 
   const sortedRooms = useMemo(() => {
@@ -214,6 +220,14 @@ export default function AdminRoomManagement() {
             <Button onClick={handleUpdate} className="w-full">Save Changes</Button>
           </div>
         </Modal>
+
+        <ConfirmDialog
+          isOpen={!!confirmDelete}
+          onClose={() => setConfirmDelete(null)}
+          onConfirm={confirmDeleteRoom}
+          title="Delete Room"
+          message={confirmDelete ? `Are you sure you want to delete room "${confirmDelete.code}"? This action cannot be undone.` : ''}
+        />
       </div>
     </AdminLayout>
   );

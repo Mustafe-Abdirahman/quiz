@@ -9,6 +9,7 @@ import Modal from '../../components/ui/Modal';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { useQuiz } from '../../context/QuizContext';
 import { useToast } from '../../components/ui/Toast';
 
