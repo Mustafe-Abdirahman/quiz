@@ -141,19 +141,29 @@ export default function QuizManagement() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
             {filtered.map(q => (
-              <div key={q.id}>
+              <div key={q.id} className="relative group/card">
                 <QuizCard quiz={q} questionCount={getQuestionCount(q)} admin />
-                <div className="flex items-center gap-1.5 mt-1.5">
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-10">
                   <button onClick={() => openEdit(q)}
-                    className="flex-1 flex items-center justify-center gap-1 py-1 text-[10px] font-medium rounded-md border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all"
+                    className="p-1.5 rounded-md bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all"
+                    title="Edit quiz"
                   >
-                    <FiEdit2 size={11} /> Edit
+                    <FiEdit2 size={12} />
                   </button>
                   <button onClick={() => handleDelete(q)}
-                    className="flex-1 flex items-center justify-center gap-1 py-1 text-[10px] font-medium rounded-md border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-500 transition-all"
+                    className="p-1.5 rounded-md bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-500 transition-all"
+                    title="Delete quiz"
                   >
-                    <FiTrash2 size={11} /> Delete
+                    <FiTrash2 size={12} />
                   </button>
+                </div>
+                <div className="mt-1.5 flex items-center gap-2 px-0.5">
+                  <div className="flex-1 h-1 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${
+                      difficultyConfig[q.difficulty]?.gradient || 'from-indigo-500 to-indigo-600'
+                    }`} style={{ width: `${Math.min(100, (getQuestionCount(q) / Math.max(...filtered.map(x => getQuestionCount(x)), 1)) * 100)}%` }} />
+                  </div>
+                  <span className="text-[9px] font-medium text-gray-400 dark:text-gray-500 shrink-0">{getQuestionCount(q)}Q</span>
                 </div>
               </div>
             ))}
