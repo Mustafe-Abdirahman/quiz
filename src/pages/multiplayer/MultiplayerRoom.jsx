@@ -309,6 +309,7 @@ export default function MultiplayerRoom() {
 
   const question = myQuestions[currentQ];
   const myTotal = myQuestions.length || 1;
+  const me = room?.players?.find(p => p.userId === user?.userId);
 
   if (!question) {
     return (
