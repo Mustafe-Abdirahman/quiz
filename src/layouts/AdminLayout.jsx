@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiGrid, FiUsers, FiBookOpen, FiBarChart2, FiFileText, FiMonitor, FiSettings, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiGrid, FiUsers, FiBookOpen, FiBarChart2, FiFileText, FiMonitor, FiSettings, FiChevronLeft, FiChevronRight, FiUserCheck } from 'react-icons/fi';
 import Navbar from '../components/common/Navbar';
 
 const sidebarLinks = [
@@ -10,6 +10,7 @@ const sidebarLinks = [
   { to: '/admin/questions', icon: FiFileText, label: 'Questions' },
   { to: '/admin/competition', icon: FiBarChart2, label: 'Monitor' },
   { to: '/admin/rooms', icon: FiMonitor, label: 'Rooms' },
+  { to: '/admin/assign', icon: FiUserCheck, label: 'Assign' },
   { to: '/admin/settings', icon: FiSettings, label: 'Settings' },
 ];
 

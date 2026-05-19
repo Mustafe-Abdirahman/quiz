@@ -104,4 +104,13 @@ export const quizService = {
   async getAllAttempts() {
     return this.getAttempts();
   },
+
+  async assignQuiz(quizId, userIds) {
+    return api.post(`/quizzes/${quizId}/assign`, { userIds });
+  },
+
+  async getAssignedUserIds(quizId) {
+    const result = await api.get(`/quizzes/${quizId}/assignments`);
+    return result.success ? result.userIds : [];
+  },
 };

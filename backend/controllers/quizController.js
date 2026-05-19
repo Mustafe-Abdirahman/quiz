@@ -3,7 +3,19 @@ import pool from '../config/db.js';
 
 export async function getQuizzes(req, res) {
   try {
-    const [rows] = await pool.query('SELECT * FROM quizzes ORDER BY createdAt DESC');
+    let rows;
+    if (req.user && req.user.role === 'user') {
+      const [r] = await pool.query(`
+        SELECT q.* FROM quizzes q
+        INNER JOIN quiz_assignments qa ON qa.quizId = q.id
+        WHERE qa.userId = ?
+        ORDER BY q.createdAt DESC
+      `, [req.user.userId]);
+      rows = r;
+    } else {
+      const [r] = await pool.query('SELECT * FROM quizzes ORDER BY createdAt DESC');
+      rows = r;
+    }
     res.json({ success: true, quizzes: rows });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to fetch quizzes' });
@@ -68,5 +80,31 @@ export async function incrementPlayCount(req, res) {
     res.json({ success: true });
   } catch {
     res.status(500).json({ success: false, message: 'Failed to update play count' });
+  }
+}
+
+export async function assignQuiz(req, res) {
+  try {
+    const { userIds } = req.body;
+    if (!Array.isArray(userIds)) {
+      return res.status(400).json({ success: false, message: 'userIds must be an array' });
+    }
+    await pool.query('DELETE FROM quiz_assignments WHERE quizId = ?', [req.params.id]);
+    if (userIds.length > 0) {
+      const values = userIds.map(uid => [req.params.id, uid]);
+      await pool.query('INSERT INTO quiz_assignments (quizId, userId) VALUES ?', [values]);
+    }
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ success: false, message: 'Failed to assign quiz' });
+  }
+}
+
+export async function getAssignments(req, res) {
+  try {
+    const [rows] = await pool.query('SELECT userId FROM quiz_assignments WHERE quizId = ?', [req.params.id]);
+    res.json({ success: true, userIds: rows.map(r => r.userId) });
+  } catch {
+    res.status(500).json({ success: false, message: 'Failed to fetch assignments' });
   }
 }
