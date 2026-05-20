@@ -292,7 +292,7 @@ export default function MultiplayerRoom() {
     const myFinished = myPlayer?.finished;
 
     return (
-      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100dvh - 64px)' }}>
         <div className="w-full max-w-md text-center">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10">
             {myFinished ? (

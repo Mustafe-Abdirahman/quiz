@@ -69,7 +69,7 @@ export default function QuizCard({ quiz, onPlay, questionCount, admin, onEdit, o
 
         {!admin && onPlay ? (
           hasQuestions ? (
-            <Button onClick={() => onPlay(quiz.id)} size="xs" className="w-full text-[10px] py-1">
+            <Button onClick={() => onPlay(quiz.id)} size="xs" className="w-full text-[10px] min-h-[44px]">
               <FiPlay size={10} />
               Play Now
             </Button>

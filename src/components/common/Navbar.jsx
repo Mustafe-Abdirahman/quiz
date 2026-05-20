@@ -47,7 +47,7 @@ export default function Navbar() {
 
 
           <div className="flex items-center gap-2">
-            <button onClick={toggleTheme} className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Toggle theme">
+            <button onClick={toggleTheme} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Toggle theme">
               {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
             </button>
             {user && (
@@ -62,15 +62,15 @@ export default function Navbar() {
                   </div>
                   <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">{user.username}</span>
                 </Link>
-                <Link to={settingsPath} className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors md:hidden" title="Settings">
+                <Link to={settingsPath} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors md:hidden" title="Settings">
                   <FiSettings size={18} />
                 </Link>
-                <button onClick={handleLogout} className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Logout">
+                <button onClick={handleLogout} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Logout">
                   <FiLogOut size={18} />
                 </button>
               </>
             )}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
               {mobileOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
           </div>
