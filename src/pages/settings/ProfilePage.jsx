@@ -81,7 +81,7 @@ export default function ProfilePage() {
   const initials = (user?.fullName || user?.username || '?').split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <button onClick={() => navigate(dashPath)} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-8 transition-colors group">
           <span className="p-1 rounded-lg group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors"><FiArrowLeft size={14} /></span>

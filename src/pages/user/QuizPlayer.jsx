@@ -132,7 +132,7 @@ export default function QuizPlayer() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -140,7 +140,7 @@ export default function QuizPlayer() {
 
   if (emptyQuiz) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <Card className="p-8 text-center">
             <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded-full inline-flex mb-4">
@@ -167,7 +167,7 @@ export default function QuizPlayer() {
     const seconds = timeTaken % 60;
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center animate-scaleIn">
             <div className="text-5xl mb-4">{accuracy >= 80 ? '🏆' : accuracy >= 50 ? '🎉' : '💪'}</div>
@@ -223,7 +223,7 @@ export default function QuizPlayer() {
   const isTrueFalse = question.type === 'truefalse';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900">
       <div className="max-w-3xl mx-auto px-4 py-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">

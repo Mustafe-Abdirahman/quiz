@@ -203,7 +203,7 @@ export default function AssignQuizPage() {
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{u.email}</p>
                         </div>
-                        <div className="hidden xs:flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
                           {u.username && <span className="hidden sm:inline">@{u.username}</span>}
                         </div>
                         {idx % 5 === 0 && (
