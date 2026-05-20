@@ -102,7 +102,7 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
-                <button type="button" onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-colors">
+                <button type="button" onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-colors">
                   <FiCamera size={14} />
                 </button>
               </div>
