@@ -121,12 +121,12 @@ export default function AdminRoomManagement() {
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{rooms.length} rooms total</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setJoinModal(true)}>
-              <FiLogIn size={16} /> Join Room
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <Button variant="secondary" size="sm" onClick={() => setJoinModal(true)}>
+              <FiLogIn size={16} /> Join
             </Button>
-            <Button onClick={() => setCreateModal(true)}>
-              <FiPlus size={16} /> Create Room
+            <Button size="sm" onClick={() => setCreateModal(true)}>
+              <FiPlus size={16} /> Create
             </Button>
           </div>
         </div>
@@ -203,10 +203,10 @@ export default function AdminRoomManagement() {
               options={[{ value: '', label: 'Select a quiz...' }, ...quizOptions]} />
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Max Players</label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                   <button key={n} type="button" onClick={() => setForm({ ...form, maxPlayers: n })}
-                    className={`w-10 h-10 rounded-lg text-sm font-medium border-2 transition-all ${
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-medium border-2 transition-all ${
                       form.maxPlayers === n
                         ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
                         : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'

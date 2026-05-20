@@ -95,12 +95,12 @@ export default function CompetitionRooms() {
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Create or join a multiplayer quiz room</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setJoinModal(true)}>
-            <FiLogIn size={16} /> Join Room
+        <div className="flex gap-2 flex-col sm:flex-row">
+          <Button variant="secondary" size="sm" onClick={() => setJoinModal(true)}>
+            <FiLogIn size={16} /> Join
           </Button>
-          <Button onClick={() => setCreateModal(true)}>
-            <FiPlus size={16} /> Create Room
+          <Button size="sm" onClick={() => setCreateModal(true)}>
+            <FiPlus size={16} /> Create
           </Button>
         </div>
       </div>

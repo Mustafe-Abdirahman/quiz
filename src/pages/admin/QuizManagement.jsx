@@ -172,10 +172,10 @@ export default function QuizManagement() {
             </div>
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Max Players</label>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-1.5 sm:gap-2 flex-wrap justify-center sm:justify-start">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                   <button key={n} type="button" onClick={() => setForm({ ...form, maxPlayers: n })}
-                    className={`w-10 h-10 rounded-lg text-sm font-medium border-2 transition-all ${
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-medium border-2 transition-all ${
                       form.maxPlayers === n
                         ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 shadow-sm'
                         : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'

@@ -107,7 +107,7 @@ export default function UserDashboard() {
             ) : (
               <div className="space-y-3">
                 {recentAttempts.map(a => (
-                  <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                  <div key={a.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{a.quizTitle}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">

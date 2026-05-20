@@ -93,8 +93,8 @@ export default function Landing() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/80 to-white dark:from-indigo-950/20 dark:to-gray-950" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-indigo-200/40 to-transparent dark:from-indigo-800/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-purple-200/30 to-transparent dark:from-purple-800/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] max-w-full bg-gradient-to-bl from-indigo-200/40 to-transparent dark:from-indigo-800/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] max-w-full bg-gradient-to-tr from-purple-200/30 to-transparent dark:from-purple-800/10 rounded-full blur-3xl" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-28 md:pt-28 md:pb-36">
           <div className="max-w-3xl mx-auto text-center">
@@ -325,8 +325,8 @@ export default function Landing() {
       {/* CTA */}
       <section className="relative overflow-hidden py-20 md:py-28">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-950 dark:from-black dark:to-gray-950" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] max-w-full bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] max-w-full bg-purple-500/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
             Start mastering today

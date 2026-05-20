@@ -148,7 +148,7 @@ export default function MultiplayerRoom() {
 
   if (!room || !quiz) {
     return (
-      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex items-center justify-center min-h-[100dvh]">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -156,9 +156,10 @@ export default function MultiplayerRoom() {
 
   if (room.status === 'waiting') {
     const myPlayer = room.players.find(p => p.userId === user?.userId);
+    const myQCount = myPlayer?.questionIds?.length || allQuestions.length || 0;
 
     return (
-      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex items-center justify-center p-4 min-h-[100dvh]">
         <div className="w-full max-w-lg text-center">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
             <div className="text-5xl mb-4">🎮</div>
@@ -220,7 +221,7 @@ export default function MultiplayerRoom() {
     const isTie = sorted.length >= 2 && sorted[0].score === sorted[1].score;
 
     return (
-      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex items-center justify-center p-4 min-h-[100dvh]">
         <div className="w-full max-w-lg">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 animate-scaleIn">
             <div className="text-center mb-6">
@@ -340,14 +341,14 @@ export default function MultiplayerRoom() {
 
   if (!question) {
     return (
-      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex items-center justify-center p-4 min-h-[100dvh]">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="flex items-center gap-3 mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
