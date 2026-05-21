@@ -82,35 +82,58 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <button onClick={() => navigate(dashPath)} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-8 transition-colors group">
-          <span className="p-1 rounded-lg group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors"><FiArrowLeft size={14} /></span>
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-5 sm:py-8">
+
+        {/* Back button */}
+        <button
+          onClick={() => navigate(dashPath)}
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-5 sm:mb-8 transition-colors group"
+        >
+          <span className="p-1 rounded-lg group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+            <FiArrowLeft size={14} />
+          </span>
           Back to Dashboard
         </button>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-          <div className="px-6 pb-6">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12 mb-6">
-              <div className="relative group">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 ring-4 ring-white dark:ring-gray-800 shadow-lg flex items-center justify-center">
+        {/* Profile header card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-4 sm:mb-6">
+          {/* Cover banner — shorter on mobile */}
+          <div className="h-24 sm:h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+            {/* Avatar + name row */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-4 -mt-10 sm:-mt-12 mb-4 sm:mb-6">
+
+              {/* Avatar */}
+              <div className="relative group shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 ring-4 ring-white dark:ring-gray-800 shadow-lg flex items-center justify-center">
                   {avatar ? (
                     <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{initials}</span>
+                      <span className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">{initials}</span>
                     </div>
                   )}
                 </div>
-                <button type="button" onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-colors">
-                  <FiCamera size={14} />
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-colors"
+                >
+                  <FiCamera size={13} />
                 </button>
               </div>
-              <div className="text-center sm:text-left flex-1">
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">{user?.fullName || user?.username}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">@{user?.username}</p>
+
+              {/* Name + handle */}
+              <div className="text-center sm:text-left flex-1 min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">
+                  {user?.fullName || user?.username}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{user?.username}</p>
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Role badge */}
+              <div className="flex items-center gap-2 shrink-0">
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
                   isAdmin
                     ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
@@ -122,19 +145,23 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-4">
-              <span className="flex items-center gap-1.5"><FiMail size={12} /> {user?.email}</span>
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-3 sm:pt-4">
+              <span className="flex items-center gap-1.5 min-w-0 truncate max-w-full"><FiMail size={12} /> {user?.email}</span>
               <span className="flex items-center gap-1.5"><FiCalendar size={12} /> Member</span>
               <span className="flex items-center gap-1.5"><FiAtSign size={12} /> ID: {user?.userId?.slice(0, 8)}...</span>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-6">
-          <Card className="p-6">
+        {/* Edit form */}
+        <form onSubmit={handleSave} className="space-y-4 sm:space-y-6">
+
+          {/* Personal information */}
+          <Card className="p-4 sm:p-6">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Personal Information</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Update your account details</p>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-5">Update your account details</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Input label="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" icon={FiUser} />
               <Input label="Username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" icon={FiUser} required />
               <div className="sm:col-span-2">
@@ -143,26 +170,28 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          <Card className="p-6">
+          {/* Change password */}
+          <Card className="p-4 sm:p-6">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Change Password</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Leave blank to keep your current password</p>
-            <div className="max-w-sm">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-5">Leave blank to keep your current password</p>
+            <div className="w-full sm:max-w-sm">
               <Input label="New Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter new password" icon={FiLock} />
             </div>
           </Card>
 
-          <Card className="p-6">
+          {/* Profile photo */}
+          <Card className="p-4 sm:p-6">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Profile Photo</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Upload a profile photo (JPG, PNG or GIF, max 2MB)</p>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-5">Upload a profile photo (JPG, PNG or GIF, max 2MB)</p>
+            <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
                 {avatar ? (
                   <img src={avatar} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <FiUser size={24} className="text-gray-400" />
+                  <FiUser size={22} className="text-gray-400" />
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
                   <FiCamera size={14} /> Choose File
                 </Button>
@@ -176,12 +205,13 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          <div className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          {/* Save bar */}
+          <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white">Save changes</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">Make sure to review your changes before saving</p>
             </div>
-            <Button type="submit" variant="primary" disabled={saving}>
+            <Button type="submit" variant="primary" disabled={saving} className="w-full xs:w-auto justify-center shrink-0">
               <FiSave size={16} /> {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
