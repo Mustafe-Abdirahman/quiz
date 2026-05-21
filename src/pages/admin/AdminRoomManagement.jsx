@@ -112,16 +112,20 @@ export default function AdminRoomManagement() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+
+        {/* ── Page header ── */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <FiUsers className="text-indigo-500" />
               Room Management
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{rooms.length} rooms total</p>
           </div>
-          <div className="flex gap-2 flex-col sm:flex-row">
+
+          {/* Action buttons — row on all sizes, aligned right on sm+ */}
+          <div className="flex gap-2 self-start sm:self-auto">
             <Button variant="secondary" size="sm" onClick={() => setJoinModal(true)}>
               <FiLogIn size={16} /> Join
             </Button>
@@ -131,6 +135,7 @@ export default function AdminRoomManagement() {
           </div>
         </div>
 
+        {/* ── Room grid ── */}
         {sortedRooms.length === 0 ? (
           <EmptyState
             icon={FiUsers}
@@ -138,33 +143,67 @@ export default function AdminRoomManagement() {
             description="Competition rooms created by users will appear here."
           />
         ) : (
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {sortedRooms.map(room => {
               const quiz = quizzes.find(q => q.id === room.quizId);
               return (
-                <Card key={room.id} className="p-4">
+                <Card key={room.id} className="p-3 sm:p-4">
+                  {/* Room code + status */}
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Room {room.code}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">
+                      Room {room.code}
+                    </h3>
                     <Badge variant={room.status}>{room.status}</Badge>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Quiz: {quiz?.title || 'Unknown'}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Players: {room.players.length}/{room.maxPlayers || 4}</p>
+
+                  {/* Meta */}
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
+                    Quiz: {quiz?.title || 'Unknown'}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    Players: {room.players.length}/{room.maxPlayers || 4}
+                  </p>
+
+                  {/* Player chips */}
                   <div className="flex flex-wrap gap-1 mb-3">
                     {room.players.map(p => (
-                      <span key={p.userId} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                      <span
+                        key={p.userId}
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300"
+                      >
                         {p.username} ({p.score})
                       </span>
                     ))}
                   </div>
+
+                  {/* Action buttons — full-width row, each flex-1 */}
                   <div className="flex gap-2">
-                    <Button size="sm" variant="secondary" onClick={() => navigate(`/admin/room/${room.id}`)} className="flex-1">
-                      <FiPlay size={14} /> Play
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => navigate(`/admin/room/${room.id}`)}
+                      className="flex-1 justify-center"
+                    >
+                      <FiPlay size={14} />
+                      <span className="hidden xs:inline sm:inline">Play</span>
                     </Button>
-                    <Button size="sm" variant="secondary" onClick={() => openEdit(room)} className="flex-1">
-                      <FiEdit2 size={14} /> Edit
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => openEdit(room)}
+                      className="flex-1 justify-center"
+                    >
+                      <FiEdit2 size={14} />
+                      <span className="hidden xs:inline sm:inline">Edit</span>
                     </Button>
-                    <Button size="sm" variant="danger" onClick={() => handleDelete(room)} className="flex-1">
-                      <FiTrash2 size={14} /> Delete
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(room)}
+                      className="flex-1 justify-center"
+                    >
+                      <FiTrash2 size={14} />
+                      <span className="hidden xs:inline sm:inline">Delete</span>
                     </Button>
                   </div>
                 </Card>
@@ -173,6 +212,7 @@ export default function AdminRoomManagement() {
           </div>
         )}
 
+        {/* ── Create modal ── */}
         <Modal isOpen={createModal} onClose={() => setCreateModal(false)} title="Create Competition Room">
           <div className="space-y-4">
             <Select label="Select Quiz" value={selectedQuiz} onChange={e => setSelectedQuiz(e.target.value)}
@@ -183,6 +223,7 @@ export default function AdminRoomManagement() {
           </div>
         </Modal>
 
+        {/* ── Join modal ── */}
         <Modal isOpen={joinModal} onClose={() => setJoinModal(false)} title="Join Room">
           <div className="space-y-4">
             <Input label="Room Code" value={roomCode} onChange={e => setRoomCode(e.target.value.toUpperCase())}
@@ -193,29 +234,42 @@ export default function AdminRoomManagement() {
           </div>
         </Modal>
 
+        {/* ── Edit modal ── */}
         <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false })} title="Edit Room">
           <div className="space-y-4">
             <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Room Code: <span className="font-mono font-bold text-gray-900 dark:text-white">{editModal.room?.code}</span></p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Current Players: {editModal.room?.players.length}/{editModal.room?.maxPlayers}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Room Code: <span className="font-mono font-bold text-gray-900 dark:text-white">{editModal.room?.code}</span>
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Current Players: {editModal.room?.players.length}/{editModal.room?.maxPlayers}
+              </p>
             </div>
+
             <Select label="Quiz" value={form.quizId} onChange={e => setForm({ ...form, quizId: e.target.value })}
               options={[{ value: '', label: 'Select a quiz...' }, ...quizOptions]} />
+
+            {/* Max players picker — centered on mobile, left-aligned on sm+ */}
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Max Players</label>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                  <button key={n} type="button" onClick={() => setForm({ ...form, maxPlayers: n })}
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setForm({ ...form, maxPlayers: n })}
                     className={`min-w-[44px] min-h-[44px] sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-medium border-2 transition-all ${
                       form.maxPlayers === n
                         ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
                         : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
-                    }`}>
+                    }`}
+                  >
                     {n}
                   </button>
                 ))}
               </div>
             </div>
+
             <Select label="Status" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} options={statusOptions} />
             <Button onClick={handleUpdate} className="w-full">Save Changes</Button>
           </div>
