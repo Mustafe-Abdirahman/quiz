@@ -86,16 +86,20 @@ export default function CompetitionRooms() {
   })), [quizzes]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+
+      {/* ── Page header ── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <FiUsers className="text-indigo-500" />
             Competition Rooms
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Create or join a multiplayer quiz room</p>
         </div>
-        <div className="flex gap-2 flex-col sm:flex-row">
+
+        {/* Action buttons */}
+        <div className="flex gap-2 self-start sm:self-auto">
           <Button variant="secondary" size="sm" onClick={() => setJoinModal(true)}>
             <FiLogIn size={16} /> Join
           </Button>
@@ -105,13 +109,16 @@ export default function CompetitionRooms() {
         </div>
       </div>
 
+      {/* ── New room banner ── */}
       {newRoom && (
-        <Card className="p-5 border-2 border-indigo-400 dark:border-indigo-500 animate-scaleIn">
+        <Card className="p-4 sm:p-5 border-2 border-indigo-400 dark:border-indigo-500 animate-scaleIn">
           <div className="text-center">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Room Created!</p>
-            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-3">{newRoom.code}</p>
+            <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">Room Created!</p>
+            <p className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-3 tracking-widest">
+              {newRoom.code}
+            </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Share this code with other players</p>
-            <div className="flex justify-center gap-2 mb-4">
+            <div className="flex flex-col xs:flex-row justify-center gap-2 mb-4">
               <Button size="sm" variant="secondary" onClick={() => handleCopyCode(newRoom.code)}>
                 {copied ? <><FiCheck size={14} /> Copied</> : <><FiCopy size={14} /> Copy Code</>}
               </Button>
@@ -119,24 +126,29 @@ export default function CompetitionRooms() {
                 Start Game
               </Button>
             </div>
-            <p className="text-xs text-gray-400">Waiting for players... ({newRoom.players.length}/{newRoom.maxPlayers || 4})</p>
+            <p className="text-xs text-gray-400">
+              Waiting for players... ({newRoom.players.length}/{newRoom.maxPlayers || 4})
+            </p>
           </div>
         </Card>
       )}
 
+      {/* ── Open / available rooms ── */}
       {availableRooms.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Open Rooms</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">Open Rooms</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {availableRooms.map(room => {
               const quiz = quizzes.find(q => q.id === room.quizId);
               return (
-                <Card key={room.id} className="p-4">
+                <Card key={room.id} className="p-3 sm:p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Room {room.code}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">
+                      Room {room.code}
+                    </h3>
                     <Badge variant="waiting">Open</Badge>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
                     Quiz: {quiz?.title || 'Unknown'}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
@@ -144,7 +156,10 @@ export default function CompetitionRooms() {
                   </p>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {room.players.map(p => (
-                      <span key={p.userId} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                      <span
+                        key={p.userId}
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300"
+                      >
                         {p.username}
                       </span>
                     ))}
@@ -153,7 +168,7 @@ export default function CompetitionRooms() {
                     const result = await roomService.joinRoom(room.code, user?.userId, user?.username);
                     if (result.success) navigate(roomRoute(role, `/room/${room.id}`));
                     else addToast(result.message, 'error');
-                  }} className="w-full">
+                  }} className="w-full justify-center">
                     <FiLogIn size={14} /> Join
                   </Button>
                 </Card>
@@ -163,39 +178,49 @@ export default function CompetitionRooms() {
         </div>
       )}
 
+      {/* ── Your rooms ── */}
       {userRooms.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Your Rooms</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">Your Rooms</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {userRooms.map(room => {
               const quiz = quizzes.find(q => q.id === room.quizId);
               return (
-                <Card key={room.id} className="p-4">
+                <Card key={room.id} className="p-3 sm:p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Room {room.code}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">
+                      Room {room.code}
+                    </h3>
                     <Badge variant={room.status}>{room.status}</Badge>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Quiz: {quiz?.title || 'Unknown'}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Players: {room.players.length}/{room.maxPlayers || 4}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
+                    Quiz: {quiz?.title || 'Unknown'}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    Players: {room.players.length}/{room.maxPlayers || 4}
+                  </p>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {room.players.map(p => (
-                      <span key={p.userId} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                      <span
+                        key={p.userId}
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300"
+                      >
                         {p.username}{p.userId === user?.userId ? ' (You)' : ''}
                       </span>
                     ))}
                   </div>
                   {room.status === 'waiting' && room.hostId === user?.userId && (
-                    <Button size="sm" onClick={() => handleStart(room.id)} className="w-full">
+                    <Button size="sm" onClick={() => handleStart(room.id)} className="w-full justify-center">
                       Start Game
                     </Button>
                   )}
                   {room.status === 'playing' && (
-                    <Button size="sm" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full">
+                    <Button size="sm" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full justify-center">
                       Rejoin
                     </Button>
                   )}
                   {room.status === 'finished' && (
-                    <Button size="sm" variant="secondary" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full">
+                    <Button size="sm" variant="secondary" onClick={() => navigate(roomRoute(role, `/room/${room.id}`))} className="w-full justify-center">
                       View Results
                     </Button>
                   )}
@@ -210,6 +235,7 @@ export default function CompetitionRooms() {
         <EmptyState icon={FiUsers} title="No rooms available" description="Create a room or join one with a code." />
       )}
 
+      {/* ── Create modal ── */}
       <Modal isOpen={createModal} onClose={() => setCreateModal(false)} title="Create Competition Room">
         <div className="space-y-4">
           <Select label="Select Quiz" value={selectedQuiz} onChange={e => setSelectedQuiz(e.target.value)}
@@ -220,6 +246,7 @@ export default function CompetitionRooms() {
         </div>
       </Modal>
 
+      {/* ── Join modal ── */}
       <Modal isOpen={joinModal} onClose={() => setJoinModal(false)} title="Join Room">
         <div className="space-y-4">
           <Input label="Room Code" value={roomCode} onChange={e => setRoomCode(e.target.value.toUpperCase())}
