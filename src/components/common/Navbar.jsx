@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiSun, FiMoon, FiLogOut, FiUser, FiGrid, FiBookOpen, FiFileText, FiMonitor, FiAward, FiSettings } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon, FiLogOut, FiUser, FiGrid, FiBookOpen, FiFileText, FiMonitor, FiAward, FiSettings, FiUserCheck } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -26,6 +26,7 @@ export default function Navbar() {
         { to: '/admin/questions', label: 'Questions', icon: FiFileText },
         { to: '/admin/rooms', label: 'Rooms', icon: FiMonitor },
         { to: '/admin/competition', label: 'Monitor', icon: FiAward },
+        { to: '/admin/assign', label: 'Assign Quiz', icon: FiUserCheck },
       ]
     : user
       ? [
