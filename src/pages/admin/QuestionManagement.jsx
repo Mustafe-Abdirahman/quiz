@@ -267,10 +267,12 @@ export default function QuestionManagement() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+
+        {/* ── Page header ── */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Question Management</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Question Management</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {questions.length} questions across {quizzes.length} quizzes
             </p>
@@ -284,7 +286,8 @@ export default function QuestionManagement() {
           />
         </div>
 
-        <div className="max-w-sm">
+        {/* ── Search ── */}
+        <div className="w-full sm:max-w-sm">
           <Input
             placeholder="Search questions across all quizzes..."
             value={search}
@@ -304,7 +307,7 @@ export default function QuestionManagement() {
             }
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {sortedQuizzes.map(quiz => {
               const quizQs = questionsByQuiz[quiz.id] || [];
               const filtered = search
@@ -317,16 +320,21 @@ export default function QuestionManagement() {
 
               return (
                 <Card key={quiz.id} className="overflow-hidden">
+
+                  {/* ── Quiz row header ── */}
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    className="flex flex-col gap-3 p-3 sm:p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:flex-row sm:items-center sm:justify-between"
                     onClick={() => toggleQuiz(quiz.id)}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {isExpanded ? <FiChevronDown size={18} className="text-gray-400 shrink-0" /> : <FiChevronRight size={18} className="text-gray-400 shrink-0" />}
+                    {/* Left: chevron + emoji + title */}
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      {isExpanded
+                        ? <FiChevronDown size={18} className="text-gray-400 shrink-0" />
+                        : <FiChevronRight size={18} className="text-gray-400 shrink-0" />}
                       <span className="text-lg">{quiz.thumbnail || '📝'}</span>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{quiz.title}</h3>
-                        <div className="flex items-center gap-2 mt-0.5">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">{quiz.title}</h3>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-0.5">
                           <Badge variant={quiz.difficulty}>{quiz.difficulty}</Badge>
                           <span className="text-xs text-gray-500 dark:text-gray-400">{quiz.category}</span>
                           <span className="text-xs text-gray-400 dark:text-gray-500">·</span>
@@ -334,58 +342,86 @@ export default function QuestionManagement() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+
+                    {/* Right: action buttons */}
+                    <div
+                      className="flex gap-2 shrink-0 self-end sm:self-auto"
+                      onClick={e => e.stopPropagation()}
+                    >
                       {hasQuestions && (
                         <Button variant="secondary" size="sm" onClick={() => handleExport(quiz)}>
-                          <FiDownload size={14} /> Export
+                          <FiDownload size={14} />
+                          <span className="hidden xs:inline sm:inline">Export</span>
                         </Button>
                       )}
                       <Button size="sm" onClick={() => openCreate(quiz.id)}>
-                        <FiPlus size={14} /> Add Question
+                        <FiPlus size={14} />
+                        <span className="hidden xs:inline sm:inline">Add Question</span>
                       </Button>
                     </div>
                   </div>
 
+                  {/* ── Expanded questions list ── */}
                   {isExpanded && (
                     <div className="border-t border-gray-100 dark:border-gray-700">
                       {filtered.length === 0 ? (
-                        <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <div className="p-4 sm:p-6 text-center text-sm text-gray-500 dark:text-gray-400">
                           {search ? 'No questions match your search' : 'No questions yet. Click "Add Question" to get started.'}
                         </div>
                       ) : (
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
                           {filtered.map(q => (
-                              <div key={q.id} className="p-4">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white">{q.text}</p>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                      {q.options.map((opt, i) => (
-                                          <span key={i} className={`px-2 py-1 text-xs rounded-md ${i === q.correctAnswer ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                                            {opt}
-                                          </span>
-                                        ))
-                                        }
-                                      </div>
-                                    <div className="flex items-center gap-2 mt-2">
-                                      <Badge variant={(typeBadgeColors[q.type] || 'blue')}>{q.type || 'multiple'}</Badge>
-                                      <Badge variant={q.difficulty}>{q.difficulty}</Badge>
-                                      <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || quiz.category}</span>
-                                    </div>
+                            <div key={q.id} className="p-3 sm:p-4">
+                              <div className="flex items-start justify-between gap-3 sm:gap-4">
+
+                                {/* Question body */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white leading-snug">{q.text}</p>
                                   </div>
-                                  <div className="flex gap-1 shrink-0">
-                                    <button onClick={() => openEdit(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600">
-                                      <FiEdit2 size={14} />
-                                    </button>
-                                    <button onClick={() => handleDelete(q)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600">
-                                      <FiTrash2 size={14} />
-                                    </button>
+
+                                  {/* Options — wraps naturally on small screens */}
+                                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                    {q.options.map((opt, i) => (
+                                      <span
+                                        key={i}
+                                        className={`px-2 py-1 text-xs rounded-md ${
+                                          i === q.correctAnswer
+                                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                                        }`}
+                                      >
+                                        {opt}
+                                      </span>
+                                    ))}
+                                  </div>
+
+                                  {/* Badges row */}
+                                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2">
+                                    <Badge variant={(typeBadgeColors[q.type] || 'blue')}>{q.type || 'multiple'}</Badge>
+                                    <Badge variant={q.difficulty}>{q.difficulty}</Badge>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{q.category || quiz.category}</span>
                                   </div>
                                 </div>
+
+                                {/* Edit / Delete buttons */}
+                                <div className="flex gap-1 shrink-0">
+                                  <button
+                                    onClick={() => openEdit(q)}
+                                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-indigo-600"
+                                  >
+                                    <FiEdit2 size={14} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(q)}
+                                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-red-600"
+                                  >
+                                    <FiTrash2 size={14} />
+                                  </button>
+                                </div>
                               </div>
-                            ))}
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -396,20 +432,25 @@ export default function QuestionManagement() {
           </div>
         )}
 
+        {/* ── Add / Edit modal ── */}
         <Modal isOpen={modal.open} onClose={() => setModal({ open: false })} title={modal.mode === 'create' ? 'Add Question' : 'Edit Question'} size="lg">
           <div className="space-y-4">
             <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-sm text-indigo-700 dark:text-indigo-300">
               {modal.mode === 'create' ? 'Adding question to' : 'Editing question in'}: <strong>{quizzes.find(q => q.id === modal.quizId)?.title}</strong>
             </div>
+
             <Input label="Question" value={form.text} onChange={e => setForm({ ...form, text: e.target.value })} placeholder="Enter question text" />
-            <div className="grid grid-cols-2 gap-3">
+
+            {/* Type + Difficulty — stack on mobile, side-by-side on sm+ */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Select label="Question Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} options={typeOptions} />
               <Select label="Difficulty" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })} options={diffOptions} />
             </div>
 
             {form.type !== 'truefalse' && (
               <>
-                <div className="grid grid-cols-2 gap-3">
+                {/* Options — stack on mobile, 2-col on sm+ */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Input label="Option 1" value={form.option1} onChange={e => setForm({ ...form, option1: e.target.value })} placeholder="Option A" />
                   <Input label="Option 2" value={form.option2} onChange={e => setForm({ ...form, option2: e.target.value })} placeholder="Option B" />
                   <Input label="Option 3" value={form.option3} onChange={e => setForm({ ...form, option3: e.target.value })} placeholder="Option C" />
