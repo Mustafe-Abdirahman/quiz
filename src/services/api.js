@@ -21,7 +21,10 @@ async function request(endpoint, options = {}) {
   try {
     res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
   } catch {
-    throw new Error('Cannot connect to server. Make sure the backend is running on port 5000.');
+    if (options.method && options.method !== 'GET') {
+      throw new Error('Offline');
+    }
+    throw new Error('Offline');
   }
 
   if (res.status === 401) {
@@ -32,6 +35,7 @@ async function request(endpoint, options = {}) {
   }
 
   if (!res.ok) {
+    if (res.status >= 500) throw new Error('Offline');
     let message = `Server error (${res.status})`;
     try {
       const err = await res.json();

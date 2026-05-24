@@ -1,14 +1,32 @@
 import { api } from './api';
+import { offlineCache, offlineQueue } from './offlineSync';
 
 export const quizService = {
   async getQuizzes() {
-    const result = await api.get('/quizzes');
-    return result.success ? result.quizzes : [];
+    try {
+      const result = await api.get('/quizzes');
+      if (result.success) {
+        offlineCache.saveQuizzes(result.quizzes);
+        return result.quizzes;
+      }
+      return [];
+    } catch {
+      return offlineCache.getQuizzes();
+    }
   },
 
   async getQuizById(id) {
-    const result = await api.get(`/quizzes/${id}`);
-    return result.success ? result.quiz : null;
+    try {
+      const result = await api.get(`/quizzes/${id}`);
+      if (result.success) {
+        offlineCache.saveQuizById(id, result.quiz);
+        return result.quiz;
+      }
+      return null;
+    } catch {
+      const quizzes = offlineCache.getQuizzes();
+      return quizzes.find(q => q.id === id) || null;
+    }
   },
 
   async createQuiz(quizData) {
@@ -28,8 +46,16 @@ export const quizService = {
   },
 
   async getQuestions() {
-    const result = await api.get('/questions');
-    return result.success ? result.questions : [];
+    try {
+      const result = await api.get('/questions');
+      if (result.success) {
+        offlineCache.saveQuestions(result.questions);
+        return result.questions;
+      }
+      return [];
+    } catch {
+      return offlineCache.getQuestions();
+    }
   },
 
   async getQuestionById(id) {
@@ -43,8 +69,19 @@ export const quizService = {
   },
 
   async getQuestionsByQuizId(quizId) {
-    const result = await api.get(`/questions/quiz/${quizId}`);
-    return result.success ? result.questions : [];
+    try {
+      const result = await api.get(`/questions/quiz/${quizId}`);
+      if (result.success) {
+        offlineCache.saveQuestionsByQuizId(quizId, result.questions);
+        return result.questions;
+      }
+      return [];
+    } catch {
+      const cached = offlineCache.getQuestionsByQuizId(quizId);
+      if (cached) return cached;
+      const all = offlineCache.getQuestions();
+      return all.filter(q => q.quizId === quizId);
+    }
   },
 
   async createQuestion(questionData) {
@@ -65,8 +102,16 @@ export const quizService = {
   },
 
   async getCategories() {
-    const result = await api.get('/categories');
-    return result.success ? result.categories : [];
+    try {
+      const result = await api.get('/categories');
+      if (result.success) {
+        offlineCache.saveCategories(result.categories);
+        return result.categories;
+      }
+      return [];
+    } catch {
+      return offlineCache.getCategories();
+    }
   },
 
   async addCategory(categoryData) {
@@ -83,7 +128,12 @@ export const quizService = {
   },
 
   async saveAttempt(attemptData) {
-    return api.post('/attempts', attemptData);
+    try {
+      return await api.post('/attempts', attemptData);
+    } catch {
+      offlineQueue.add({ ...attemptData, _id: Date.now().toString(36) + Math.random().toString(36).slice(2) });
+      return { success: true, offline: true };
+    }
   },
 
   async getUserAttempts(userId) {
