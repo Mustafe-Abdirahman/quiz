@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS quizzes (
   thumbnail VARCHAR(10) DEFAULT '📝',
   maxPlayers INT DEFAULT 4,
   playCount INT DEFAULT 0,
+  startMode ENUM('manual', 'scheduled') DEFAULT 'manual',
+  scheduledStart DATETIME DEFAULT NULL,
   createdBy VARCHAR(36),
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE SET NULL

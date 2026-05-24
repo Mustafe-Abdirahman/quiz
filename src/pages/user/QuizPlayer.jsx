@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiCheck, FiX, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
+import { FiCheck, FiX, FiAlertCircle, FiClock, FiArrowLeft } from 'react-icons/fi';
 import Timer from '../../components/common/Timer';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -31,6 +31,7 @@ export default function QuizPlayer() {
   const [isRunning, setIsRunning] = useState(true);
   const [loading, setLoading] = useState(true);
   const [emptyQuiz, setEmptyQuiz] = useState(false);
+  const [notAvailable, setNotAvailable] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,6 +39,12 @@ export default function QuizPlayer() {
       const q = await quizService.getQuizById(id);
       if (!q) { navigate('/user/quizzes'); return; }
       if (cancelled) return;
+      if (q.startMode === 'scheduled' && q.scheduledStart && new Date(q.scheduledStart) > new Date()) {
+        setNotAvailable(true);
+        setQuiz(q);
+        setLoading(false);
+        return;
+      }
       setQuiz(q);
       const qs = await quizService.getQuestionsByQuizId(id);
       if (cancelled) return;
@@ -134,6 +141,31 @@ export default function QuizPlayer() {
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (notAvailable) {
+    const scheduledDate = quiz?.scheduledStart ? new Date(quiz.scheduledStart) : null;
+    return (
+      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card className="p-8 text-center">
+            <div className="p-4 bg-purple-100 dark:bg-purple-900/20 rounded-full inline-flex mb-4">
+              <FiClock size={40} className="text-purple-600 dark:text-purple-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Quiz Not Yet Available</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              This quiz is scheduled to start at:
+            </p>
+            <p className="text-lg font-semibold text-purple-600 dark:text-purple-400 mb-6">
+              {scheduledDate ? scheduledDate.toLocaleString() : 'TBD'}
+            </p>
+            <Button onClick={() => navigate('/user/quizzes')}>
+              <FiArrowLeft size={16} /> Back to Quizzes
+            </Button>
+          </Card>
+        </div>
       </div>
     );
   }

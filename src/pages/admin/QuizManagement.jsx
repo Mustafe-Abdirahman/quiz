@@ -32,10 +32,11 @@ export default function QuizManagement() {
   const [form, setForm] = useState({
     title: '', description: '', category: 'General', difficulty: 'medium',
     timePerQuestion: 60, thumbnail: '📝', maxPlayers: 4,
+    startMode: 'manual', scheduledStart: '',
   });
 
   const openCreate = () => {
-    setForm({ title: '', description: '', category: 'General', difficulty: 'medium', timePerQuestion: 60, thumbnail: '📝', maxPlayers: 4 });
+    setForm({ title: '', description: '', category: 'General', difficulty: 'medium', timePerQuestion: 60, thumbnail: '📝', maxPlayers: 4, startMode: 'manual', scheduledStart: '' });
     setModal({ open: true, mode: 'create', quiz: null });
   };
 
@@ -43,7 +44,8 @@ export default function QuizManagement() {
     setForm({
       title: quiz.title, description: quiz.description || '', category: quiz.category,
       difficulty: quiz.difficulty, timePerQuestion: quiz.timePerQuestion, thumbnail: quiz.thumbnail || '📝',
-      maxPlayers: quiz.maxPlayers || 4,
+      maxPlayers: quiz.maxPlayers || 4, startMode: quiz.startMode || 'manual',
+      scheduledStart: quiz.scheduledStart ? quiz.scheduledStart.slice(0, 16) : '',
     });
     setModal({ open: true, mode: 'edit', quiz });
   };
@@ -186,6 +188,33 @@ export default function QuizManagement() {
               </div>
               <p className="text-xs text-gray-400">Players allowed in multiplayer mode</p>
             </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Mode</label>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setForm({ ...form, startMode: 'manual', scheduledStart: '' })}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium border-2 transition-all ${
+                    form.startMode === 'manual'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
+                  }`}>
+                  Manual Start
+                </button>
+                <button type="button" onClick={() => setForm({ ...form, startMode: 'scheduled' })}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium border-2 transition-all ${
+                    form.startMode === 'scheduled'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
+                  }`}>
+                  Scheduled
+                </button>
+              </div>
+            </div>
+
+            {form.startMode === 'scheduled' && (
+              <Input label="Scheduled Start" type="datetime-local" value={form.scheduledStart}
+                onChange={e => setForm({ ...form, scheduledStart: e.target.value })} />
+            )}
+
             {modal.mode === 'edit' && (
               <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-sm text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
                 <FiCopy size={14} />

@@ -8,14 +8,26 @@ export async function getQuizzes(req, res) {
       try {
         await ensureAssignmentsTable();
         const [r] = await pool.query(`
-          SELECT q.* FROM quizzes q
+          SELECT q.*, 
+            CASE 
+              WHEN q.startMode = 'scheduled' AND q.scheduledStart IS NOT NULL AND q.scheduledStart > NOW() THEN 0
+              ELSE 1
+            END as available
+          FROM quizzes q
           INNER JOIN quiz_assignments qa ON qa.quizId = q.id
           WHERE qa.userId = ?
           ORDER BY q.createdAt DESC
         `, [req.user.userId]);
         rows = r;
       } catch {
-        const [r] = await pool.query('SELECT * FROM quizzes ORDER BY createdAt DESC');
+        const [r] = await pool.query(`
+          SELECT q.*,
+            CASE 
+              WHEN q.startMode = 'scheduled' AND q.scheduledStart IS NOT NULL AND q.scheduledStart > NOW() THEN 0
+              ELSE 1
+            END as available
+          FROM quizzes q ORDER BY q.createdAt DESC
+        `);
         rows = r;
       }
     } else {
@@ -30,7 +42,14 @@ export async function getQuizzes(req, res) {
 
 export async function getQuizById(req, res) {
   try {
-    const [rows] = await pool.query('SELECT * FROM quizzes WHERE id = ?', [req.params.id]);
+    const [rows] = await pool.query(`
+      SELECT q.*,
+        CASE 
+          WHEN q.startMode = 'scheduled' AND q.scheduledStart IS NOT NULL AND q.scheduledStart > NOW() THEN 0
+          ELSE 1
+        END as available
+      FROM quizzes q WHERE q.id = ?
+    `, [req.params.id]);
     if (rows.length === 0) return res.status(404).json({ success: false, message: 'Quiz not found' });
     res.json({ success: true, quiz: rows[0] });
   } catch {
@@ -40,16 +59,19 @@ export async function getQuizById(req, res) {
 
 export async function createQuiz(req, res) {
   try {
-    const { title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers } = req.body;
+    const { title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, startMode, scheduledStart } = req.body;
     if (!title || title.trim().length < 3) {
       return res.status(400).json({ success: false, message: 'Title must be at least 3 characters' });
     }
+    const mode = startMode === 'scheduled' ? 'scheduled' : 'manual';
+    const sched = mode === 'scheduled' ? (scheduledStart || null) : null;
     const id = crypto.randomUUID();
     await pool.query(
-      `INSERT INTO quizzes (id, title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, createdBy, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      `INSERT INTO quizzes (id, title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, createdBy, createdAt, startMode, scheduledStart)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,
       [id, title, description || '', category || 'General', difficulty || 'medium',
-       Number(timePerQuestion) || 60, thumbnail || '📝', Number(maxPlayers) || 4, req.user.userId]
+       Number(timePerQuestion) || 60, thumbnail || '📝', Number(maxPlayers) || 4,
+       req.user.userId, mode, sched]
     );
     const [rows] = await pool.query('SELECT * FROM quizzes WHERE id = ?', [id]);
     res.status(201).json({ success: true, quiz: rows[0] });
@@ -60,10 +82,12 @@ export async function createQuiz(req, res) {
 
 export async function updateQuiz(req, res) {
   try {
-    const { title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers } = req.body;
+    const { title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, startMode, scheduledStart } = req.body;
+    const mode = startMode === 'scheduled' ? 'scheduled' : 'manual';
+    const sched = mode === 'scheduled' ? (scheduledStart || null) : null;
     await pool.query(
-      `UPDATE quizzes SET title = ?, description = ?, category = ?, difficulty = ?, timePerQuestion = ?, thumbnail = ?, maxPlayers = ? WHERE id = ?`,
-      [title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, req.params.id]
+      `UPDATE quizzes SET title = ?, description = ?, category = ?, difficulty = ?, timePerQuestion = ?, thumbnail = ?, maxPlayers = ?, startMode = ?, scheduledStart = ? WHERE id = ?`,
+      [title, description, category, difficulty, timePerQuestion, thumbnail, maxPlayers, mode, sched, req.params.id]
     );
     res.json({ success: true });
   } catch {
